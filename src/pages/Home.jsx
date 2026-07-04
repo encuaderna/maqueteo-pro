@@ -14,6 +14,8 @@ import AccessibilityControls from "@/components/novel/AccessibilityControls";
 import HistoryPanel from "@/components/novel/HistoryPanel";
 import ReviewPanel from "@/components/novel/ReviewPanel";
 import { useLocalHistory } from "@/hooks/useLocalHistory";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import ShortcutsHint from "@/components/novel/ShortcutsHint";
 
 export default function Home() {
   const { toast } = useToast();
@@ -39,6 +41,9 @@ export default function Home() {
 
   const { history, lastSavedAt, deleteVersion, clearHistory, exportHistory, importHistory } =
     useLocalHistory(text, metadata, settings);
+
+  // Chapter navigation state (for keyboard shortcuts)
+  const [activeChapterIndex, setActiveChapterIndex] = useState(0);
 
   const handleRestoreVersion = useCallback((entry) => {
     const { text: t, metadata: m, settings: s } = entry.snapshot;
@@ -117,6 +122,14 @@ export default function Home() {
     setActiveTab("text");
     toast({ title: `"${project.title}" cargado` });
   }, [toast]);
+
+  useKeyboardShortcuts({
+    onSave: handleSaveProject,
+    onTogglePreview: () => text && setShowPreview(v => !v),
+    onSwitchTab: setActiveTab,
+    onPrevChapter: () => setActiveChapterIndex(i => Math.max(0, i - 1)),
+    onNextChapter: () => setActiveChapterIndex(i => Math.min(chapters.length - 1, i + 1)),
+  });
 
   const handleNewProject = useCallback(() => {
     setText("");
@@ -314,6 +327,7 @@ export default function Home() {
             </div>
 
             <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
+            <ShortcutsHint />
             <AccessibilityControls />
           </div>
         </div>
