@@ -80,7 +80,7 @@ export default function MetadataForm({ metadata, onChange }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="meta-link" className="text-xs">Enlace original (AO3, etc.)</Label>
+        <Label htmlFor="meta-link" className="text-xs">Enlace original</Label>
         <Input
           id="meta-link"
           type="url"
