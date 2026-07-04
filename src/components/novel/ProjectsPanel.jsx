@@ -6,7 +6,7 @@ import { useLang } from "@/lib/LanguageContext";
 import {
   Plus, Trash2, Clock, FolderOpen, Save, Loader2,
   Folder, FolderPlus, ChevronDown, ChevronRight, X, Check,
-  PackageOpen, Square, CheckSquare, Download, Search
+  PackageOpen, Square, CheckSquare, Download, Search, PanelLeftClose, PanelLeftOpen
 } from "lucide-react";
 import BulkExportModal from "@/components/novel/BulkExportModal";
 
@@ -215,6 +215,7 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
 
 export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave }) {
   const { t } = useLang();
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem("projects-panel-collapsed") === "true");
   const [projects, setProjects] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -224,6 +225,11 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showBulkExport, setShowBulkExport] = useState(false);
   const [search, setSearch] = useState("");
+
+  const toggleCollapsed = () => setCollapsed(v => {
+    localStorage.setItem("projects-panel-collapsed", String(!v));
+    return !v;
+  });
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -301,8 +307,37 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
 
   const uncategorized = filtered.filter(p => !p.collection_id);
 
+  // Collapsed: render a slim icon rail
+  if (collapsed) {
+    return (
+      <div className="flex-shrink-0 hidden lg:flex flex-col items-center gap-1 pt-0.5">
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleCollapsed} title="Mostrar proyectos" aria-label="Mostrar proyectos">
+          <PanelLeftOpen className="w-3.5 h-3.5" />
+        </Button>
+        <div className="w-px h-3 bg-border" />
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { onNew(); }} title={t.newProject} aria-label={t.newProject}>
+          <Plus className="w-3.5 h-3.5" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleSave} disabled={saving} title={t.saveProject} aria-label={t.saveProject}>
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+        </Button>
+        {currentProject && (
+          <div className="mt-1 w-7 h-7 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center" title={currentProject.title}>
+            <FolderOpen className="w-3.5 h-3.5 text-primary" />
+          </div>
+        )}
+        {showBulkExport && (
+          <BulkExportModal
+            projects={projects.filter(p => selectedIds.has(p.id))}
+            onClose={() => { setShowBulkExport(false); exitSelectMode(); }}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="w-56 flex-shrink-0 hidden lg:flex flex-col">
+    <div className="w-52 flex-shrink-0 hidden lg:flex flex-col">
       <div className="sticky top-20 flex flex-col gap-2 max-h-[calc(100vh-6rem)] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
@@ -348,6 +383,10 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
                 <X className="w-3.5 h-3.5" />
               </Button>
             )}
+            {/* Collapse toggle */}
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleCollapsed} title="Colapsar panel" aria-label="Colapsar panel">
+              <PanelLeftClose className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </div>
 
