@@ -19,6 +19,7 @@ import ShortcutsHint from "@/components/novel/ShortcutsHint";
 import QuickNotes from "@/components/novel/QuickNotes";
 import LanguageSelector from "@/components/novel/LanguageSelector";
 import KanbanBoard from "@/components/novel/KanbanBoard";
+import InstallPWA from "@/components/InstallPWA";
 import { useLang } from "@/lib/LanguageContext";
 
 export default function Home() {
@@ -536,6 +537,9 @@ export default function Home() {
           onClose={() => setShowKanban(false)}
         />
       )}
+
+      {/* PWA install banner */}
+      <InstallPWA />
 
       {/* History panel */}
       {showHistory && (

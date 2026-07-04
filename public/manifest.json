@@ -1,0 +1,48 @@
+{
+  "name": "Novelista — Formateador de Novelas",
+  "short_name": "Novelista",
+  "description": "Formatea tu novela para impresión en PDF o Word con tipografía profesional.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "orientation": "any",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "https://base44.com/logo_v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://base44.com/logo_v2.svg",
+      "sizes": "1280x800",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Novelista en escritorio"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nuevo proyecto",
+      "url": "/",
+      "description": "Crear un nuevo proyecto de novela"
+    }
+  ]
+}
