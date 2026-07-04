@@ -404,6 +404,23 @@ export default function Home() {
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Capítulos</p>
                     <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{chapters.length}</p>
                   </div>
+                  <div className="h-px bg-border" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Lectura est.</p>
+                    {(() => {
+                      const mins = Math.ceil(wordCount / 200);
+                      const h = Math.floor(mins / 60);
+                      const m = mins % 60;
+                      return (
+                        <>
+                          <p className="text-2xl font-heading font-semibold tabular-nums leading-none">
+                            {h > 0 ? `${h}h ${m}m` : `${m}m`}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">a 200 pal/min</p>
+                        </>
+                      );
+                    })()}
+                  </div>
                   {chapters.length > 0 && (
                     <>
                       <div className="h-px bg-border" />
