@@ -17,9 +17,12 @@ import { useLocalHistory } from "@/hooks/useLocalHistory";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ShortcutsHint from "@/components/novel/ShortcutsHint";
 import QuickNotes from "@/components/novel/QuickNotes";
+import LanguageSelector from "@/components/novel/LanguageSelector";
+import { useLang } from "@/lib/LanguageContext";
 
 export default function Home() {
   const { toast } = useToast();
+  const { t } = useLang();
   const [text, setText] = useState("");
   const [metadata, setMetadata] = useState({
     title: "",
@@ -70,7 +73,7 @@ export default function Home() {
 
   const handleSaveProject = useCallback(async () => {
     if (!metadata.title && !text) {
-      toast({ title: "Proyecto vacío", description: "Agrega al menos un título o texto.", variant: "destructive" });
+      toast({ title: t.toastEmptyProject, description: t.toastEmptyProjectDesc, variant: "destructive" });
       return;
     }
     const data = {
@@ -93,14 +96,14 @@ export default function Home() {
       if (currentProject?.id) {
         await base44.entities.FormattingProject.update(currentProject.id, data);
         setCurrentProject(prev => ({ ...prev, ...data }));
-        toast({ title: "Proyecto guardado" });
+        toast({ title: t.toastSaved });
       } else {
         const created = await base44.entities.FormattingProject.create(data);
         setCurrentProject(created);
-        toast({ title: "Proyecto guardado" });
+        toast({ title: t.toastSaved });
       }
     } catch (e) {
-      toast({ title: "Error al guardar", description: e.message, variant: "destructive" });
+      toast({ title: t.toastErrorSave, description: e.message, variant: "destructive" });
     }
   }, [metadata, text, settings, currentProject, toast]);
 
@@ -121,7 +124,7 @@ export default function Home() {
     setSettings({ ...DEFAULT_SETTINGS, ...cleanSettings });
     setCurrentProject(project);
     setActiveTab("text");
-    toast({ title: `"${project.title}" cargado` });
+    toast({ title: t.toastLoaded(project.title || t.withoutTitle) });
   }, [toast]);
 
   useKeyboardShortcuts({
@@ -142,11 +145,11 @@ export default function Home() {
 
   const handleGeneratePdf = useCallback(async () => {
     if (!text.trim()) {
-      toast({ title: "Sin texto", description: "Pega el texto de tu novela primero.", variant: "destructive" });
+      toast({ title: t.toastNoText, description: t.toastNoTextDesc, variant: "destructive" });
       return;
     }
     if (!metadata.title) {
-      toast({ title: "Sin título", description: "Ingresa al menos el título del libro.", variant: "destructive" });
+      toast({ title: t.toastNoTitle, description: t.toastNoTitleDesc, variant: "destructive" });
       return;
     }
 
@@ -169,11 +172,11 @@ export default function Home() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      toast({ title: "¡Listo!", description: "Tu libro se está descargando." });
+      toast({ title: t.toastDone, description: t.toastPdfDesc });
     } catch (err) {
       toast({
-        title: "Error al generar PDF",
-        description: err.message || "Intenta de nuevo.",
+        title: t.toastErrorPdf,
+        description: err.message || t.toastRetry,
         variant: "destructive",
       });
     } finally {
@@ -183,11 +186,11 @@ export default function Home() {
 
   const handleGenerateDocx = useCallback(async () => {
     if (!text.trim()) {
-      toast({ title: "Sin texto", description: "Pega el texto de tu novela primero.", variant: "destructive" });
+      toast({ title: t.toastNoText, description: t.toastNoTextDesc, variant: "destructive" });
       return;
     }
     if (!metadata.title) {
-      toast({ title: "Sin título", description: "Ingresa al menos el título del libro.", variant: "destructive" });
+      toast({ title: t.toastNoTitle, description: t.toastNoTitleDesc, variant: "destructive" });
       return;
     }
     setIsGeneratingDocx(true);
@@ -206,9 +209,9 @@ export default function Home() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast({ title: "¡Listo!", description: "Tu libro Word se está descargando." });
+      toast({ title: t.toastDone, description: t.toastWordDesc });
     } catch (err) {
-      toast({ title: "Error al generar Word", description: err.message || "Intenta de nuevo.", variant: "destructive" });
+      toast({ title: t.toastErrorWord, description: err.message || t.toastRetry, variant: "destructive" });
     } finally {
       setIsGeneratingDocx(false);
     }
@@ -218,7 +221,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Skip to main content — visible on focus (keyboard/screen reader) */}
       <a href="#main-content" className="skip-link">
-        Saltar al contenido principal
+        {t.skipToMain}
       </a>
 
       {/* Header */}
@@ -227,12 +230,12 @@ export default function Home() {
           {/* Brand */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <BookOpen className="w-5 h-5 text-foreground" aria-hidden="true" />
-            <span className="font-heading font-semibold tracking-tight" aria-label="Novelista — Formateador de novelas">
-              Novelista
+            <span className="font-heading font-semibold tracking-tight" aria-label={t.appName}>
+              {t.appName}
             </span>
             {currentProject && (
               <span className="text-sm text-muted-foreground hidden sm:inline truncate max-w-[160px]" aria-live="polite">
-                · {currentProject.title || "Sin título"}
+                · {currentProject.title || t.withoutTitle}
               </span>
             )}
           </div>
@@ -243,7 +246,7 @@ export default function Home() {
             {text && (
               <span className="text-xs text-muted-foreground hidden md:flex items-center gap-1.5 bg-muted px-2.5 py-1 rounded-full" aria-live="polite">
                 <FileText className="w-3 h-3" aria-hidden="true" />
-                {chapters.length} cap. · {wordCount.toLocaleString()} palabras
+                {t.chaptersCount(chapters.length)} · {t.words(wordCount.toLocaleString())}
               </span>
             )}
 
@@ -256,10 +259,10 @@ export default function Home() {
               className={`text-xs h-8 gap-1.5 ${showHistory ? "bg-accent text-accent-foreground" : ""}`}
               onClick={() => setShowHistory(v => !v)}
               aria-pressed={showHistory}
-              aria-label={showHistory ? "Cerrar historial" : "Abrir historial"}
+              aria-label={t.history}
             >
               <History className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Historial</span>
+              <span className="hidden sm:inline">{t.history}</span>
               {history.length > 0 && (
                 <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4" aria-hidden="true">
                   {history.length}
@@ -274,10 +277,10 @@ export default function Home() {
               className="text-xs h-8 gap-1.5"
               onClick={() => setShowReview(true)}
               disabled={!text}
-              aria-label="Abrir modo revisión"
+              aria-label={t.review}
             >
               <SplitSquareHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Revisar</span>
+              <span className="hidden sm:inline">{t.review}</span>
             </Button>
 
             {/* Preview toggle */}
@@ -288,10 +291,10 @@ export default function Home() {
               onClick={() => setShowPreview(!showPreview)}
               disabled={!text}
               aria-pressed={showPreview}
-              aria-label={showPreview ? "Ocultar vista previa" : "Ver vista previa"}
+              aria-label={showPreview ? t.hidePreview : t.showPreview}
             >
               <Eye className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-              {showPreview ? "Ocultar" : "Previsualizar"}
+              {showPreview ? t.hidePreview : t.showPreview}
             </Button>
 
             {/* Download buttons */}
@@ -309,7 +312,7 @@ export default function Home() {
                 ) : (
                   <FileText className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                 )}
-                {isGeneratingDocx ? "Generando…" : "Word"}
+                {isGeneratingDocx ? t.generatingWord : "Word"}
               </Button>
               <Button
                 size="sm"
@@ -323,7 +326,7 @@ export default function Home() {
                 ) : (
                   <Download className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                 )}
-                {isGenerating ? "Generando…" : "PDF"}
+                {isGenerating ? t.generatingPdf : "PDF"}
               </Button>
             </div>
 
