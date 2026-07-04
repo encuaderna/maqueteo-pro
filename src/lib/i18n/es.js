@@ -119,6 +119,9 @@ export default {
   templatesErrorSave: "Error al guardar",
   templatesDeleteLabel: (n) => `Eliminar plantilla "${n}"`,
 
+  searchProjects: "Buscar por título o autor…",
+  noSearchResults: "Sin resultados para esa búsqueda.",
+
   // Kanban
   kanbanTitle: "Tablero de proyectos",
   kanbanClose: "Cerrar tablero",

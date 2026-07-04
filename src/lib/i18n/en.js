@@ -119,6 +119,9 @@ export default {
   templatesErrorSave: "Error saving",
   templatesDeleteLabel: (n) => `Delete template "${n}"`,
 
+  searchProjects: "Search by title or author…",
+  noSearchResults: "No results for that search.",
+
   // Kanban
   kanbanTitle: "Projects board",
   kanbanClose: "Close board",

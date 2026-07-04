@@ -119,6 +119,9 @@ export default {
   templatesErrorSave: "Erro ao salvar",
   templatesDeleteLabel: (n) => `Excluir modelo "${n}"`,
 
+  searchProjects: "Buscar por título ou autor…",
+  noSearchResults: "Sem resultados para essa busca.",
+
   // Kanban
   kanbanTitle: "Quadro de projetos",
   kanbanClose: "Fechar quadro",

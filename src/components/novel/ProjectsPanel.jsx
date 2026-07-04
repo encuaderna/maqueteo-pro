@@ -6,7 +6,7 @@ import { useLang } from "@/lib/LanguageContext";
 import {
   Plus, Trash2, Clock, FolderOpen, Save, Loader2,
   Folder, FolderPlus, ChevronDown, ChevronRight, X, Check,
-  PackageOpen, Square, CheckSquare, Download
+  PackageOpen, Square, CheckSquare, Download, Search
 } from "lucide-react";
 import BulkExportModal from "@/components/novel/BulkExportModal";
 
@@ -223,6 +223,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showBulkExport, setShowBulkExport] = useState(false);
+  const [search, setSearch] = useState("");
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -289,7 +290,15 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
     }
   };
 
-  const uncategorized = projects.filter(p => !p.collection_id);
+  const query = search.trim().toLowerCase();
+  const filtered = query
+    ? projects.filter(p =>
+        (p.title || "").toLowerCase().includes(query) ||
+        (p.author || "").toLowerCase().includes(query)
+      )
+    : projects;
+
+  const uncategorized = filtered.filter(p => !p.collection_id);
 
   return (
     <div className="w-56 flex-shrink-0 hidden lg:flex flex-col">
@@ -367,6 +376,29 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
           </Button>
         )}
 
+        {/* Search */}
+        {!selectMode && (
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t.searchProjects}
+              className="w-full pl-6 pr-6 h-7 text-xs rounded-md border border-input bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
+
         {/* New collection form */}
         {showNewCollection && (
           <NewCollectionForm
@@ -385,6 +417,10 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
             <p className="text-xs text-muted-foreground text-center py-6 leading-relaxed px-2">
               {t.noProjectsYet}
             </p>
+          ) : filtered.length === 0 && query ? (
+            <p className="text-xs text-muted-foreground text-center py-6 leading-relaxed px-2">
+              {t.noSearchResults}
+            </p>
           ) : (
             <>
               {/* Collections */}
@@ -392,7 +428,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
                 <CollectionGroup
                   key={col.id}
                   collection={col}
-                  projects={projects.filter(p => p.collection_id === col.id)}
+                  projects={filtered.filter(p => p.collection_id === col.id)}
                   currentProject={currentProject}
                   onLoad={onLoad}
                   onDelete={handleDelete}
