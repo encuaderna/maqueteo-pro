@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, Settings, FileText, Loader2, ChevronDown } from "lucide-react";
+import { BookOpen, Download, Eye, Settings, FileText, Loader2, ChevronDown, History } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
@@ -12,6 +12,8 @@ import TextInput from "@/components/novel/TextInput";
 import BookPreview from "@/components/novel/BookPreview";
 import ProjectsPanel from "@/components/novel/ProjectsPanel";
 import AccessibilityControls from "@/components/novel/AccessibilityControls";
+import HistoryPanel from "@/components/novel/HistoryPanel";
+import { useLocalHistory } from "@/hooks/useLocalHistory";
 
 export default function Home() {
   const { toast } = useToast();
@@ -32,6 +34,29 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("text");
   const [showPreview, setShowPreview] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const { history, lastSavedAt, deleteVersion, clearHistory, exportHistory, importHistory } =
+    useLocalHistory(text, metadata, settings);
+
+  const handleRestoreVersion = useCallback((entry) => {
+    const { text: t, metadata: m, settings: s } = entry.snapshot;
+    setText(t || "");
+    setMetadata(m || {});
+    setSettings({ ...DEFAULT_SETTINGS, ...(s || {}) });
+    setShowHistory(false);
+    toast({ title: "Versión restaurada", description: `Restaurado desde ${new Date(entry.timestamp).toLocaleTimeString("es-CL")}` });
+  }, [toast]);
+
+  const handleImportHistory = useCallback(async (file) => {
+    if (!file) return;
+    try {
+      const count = await importHistory(file);
+      toast({ title: "Historial importado", description: `${count} versiones cargadas.` });
+    } catch {
+      toast({ title: "Error al importar", description: "El archivo no es válido.", variant: "destructive" });
+    }
+  }, [importHistory, toast]);
 
   const chapters = useMemo(() => parseChapters(text), [text]);
   const wordCount = useMemo(() => countWords(text), [text]);
@@ -201,6 +226,24 @@ export default function Home() {
           <div className="flex items-center gap-3">
             {/* Accessibility controls */}
             <AccessibilityControls />
+            <div aria-hidden="true" className="w-px h-4 bg-border" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-8 gap-1.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+              onClick={() => setShowHistory(v => !v)}
+              aria-pressed={showHistory}
+              aria-label={showHistory ? "Cerrar historial de versiones" : "Abrir historial de versiones"}
+              title="Historial de versiones"
+            >
+              <History className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Historial</span>
+              {history.length > 0 && (
+                <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4">
+                  {history.length}
+                </span>
+              )}
+            </Button>
             <div aria-hidden="true" className="w-px h-4 bg-border" />
 
             {text && (
@@ -376,6 +419,21 @@ export default function Home() {
           </section>
         )}
       </div>
+
+      {/* History panel */}
+      {showHistory && (
+        <HistoryPanel
+          history={history}
+          currentText={text}
+          lastSavedAt={lastSavedAt}
+          onRestore={handleRestoreVersion}
+          onDelete={deleteVersion}
+          onClear={clearHistory}
+          onExport={exportHistory}
+          onImport={handleImportHistory}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   );
 }
