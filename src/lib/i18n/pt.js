@@ -12,8 +12,8 @@ export default {
 
   // Tabs
   tabText: "Texto",
-  tabMetadata: "Metadados",
-  tabSettings: "Configurações",
+  tabMetadata: "Detalhes",
+  tabSettings: "Formato",
 
   // Projects panel
   projects: "Projetos",
@@ -41,7 +41,7 @@ export default {
   statsTitle: "Estatísticas",
   statWords: "Palavras",
   statChapters: "Capítulos",
-  statReadingTime: "Leitura est.",
+  statReadingTime: "Tempo de leitura",
   statAvgPerChapter: "Média / cap.",
   statWordsUnit: "palavras",
   statReadingRate: "a 200 pal/min",

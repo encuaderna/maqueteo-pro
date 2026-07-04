@@ -71,8 +71,8 @@ export default function TextInput({ text, onChange }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onChange("")}
-              className="text-xs text-muted-foreground h-7 gap-1 hover:text-destructive"
+              onClick={() => { if (window.confirm("¿Limpiar todo el texto? Esta acción no se puede deshacer.")) onChange(""); }}
+              className="text-xs text-muted-foreground h-7 gap-1 hover:text-destructive hover:bg-destructive/5"
               aria-label="Limpiar todo el texto"
             >
               <Trash2 className="w-3 h-3" aria-hidden="true" />

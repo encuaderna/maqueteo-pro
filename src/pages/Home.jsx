@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, FileText, Loader2, History, SplitSquareHorizontal, ChevronDown } from "lucide-react";
+import { BookOpen, Download, Eye, FileText, Loader2, History, SplitSquareHorizontal, ChevronDown, Settings2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { parseChapters, countWords, DEFAULT_SETTINGS } from "@/lib/formatting-utils";
@@ -259,6 +259,7 @@ export default function Home() {
 
             <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
 
+            {/* Secondary actions group */}
             {/* History */}
             <Button
               variant="ghost"
@@ -277,30 +278,32 @@ export default function Home() {
               )}
             </Button>
 
-            {/* Kanban board */}
+            {/* Kanban board — secondary action, icon only on smaller viewports */}
             <Button
               variant="ghost"
-              size="sm"
-              className="text-xs h-8 gap-1.5"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={() => setShowKanban(true)}
               aria-label={t.kanbanBtn}
+              title={t.kanbanBtn}
             >
               <SplitSquareHorizontal className="w-3.5 h-3.5 rotate-90" aria-hidden="true" />
-              <span className="hidden sm:inline">{t.kanbanBtn}</span>
             </Button>
 
-            {/* Review mode */}
+            {/* Review mode — secondary action, icon only */}
             <Button
               variant="ghost"
-              size="sm"
-              className="text-xs h-8 gap-1.5"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={() => setShowReview(true)}
               disabled={!text}
               aria-label={t.review}
+              title={t.review}
             >
               <SplitSquareHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">{t.review}</span>
             </Button>
+
+            <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
 
             {/* Preview toggle */}
             <Button
@@ -376,7 +379,7 @@ export default function Home() {
                   {t.tabMetadata}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
-                  <SplitSquareHorizontal className="w-3.5 h-3.5 mr-1.5 rotate-45" aria-hidden="true" />
+                  <Settings2 className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                   {t.tabSettings}
                 </TabsTrigger>
               </TabsList>
