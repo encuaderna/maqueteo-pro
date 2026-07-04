@@ -9,9 +9,14 @@ export const DEFAULT_SETTINGS = {
   showMetadata: true,
   showDropCap: true,
   dropCap: {
-    font: 'Garamond', // 'Garamond', 'Georgia', 'serif'
-    sizeMultiplier: 3, // 2, 3, 4 — multiplier over body font
-    linesHigh: 2, // how many lines the cap spans visually
+    font: 'Garamond',
+    sizeMultiplier: 3,
+    linesHigh: 2,
+  },
+  typography: {
+    body: 'EB Garamond',
+    chapter: 'EB Garamond',
+    title: 'EB Garamond',
   },
   authorNotesStyle: 'A', // 'A' = subtle, 'B' = boxed
   sceneSeparator: 'fleuron', // 'fleuron', 'ornament', 'stars', 'line', 'custom'

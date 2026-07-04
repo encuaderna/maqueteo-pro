@@ -8,10 +8,15 @@ import { SCENE_SEPARATORS } from "@/lib/formatting-utils";
 import { Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
+import FontPicker from "@/components/novel/FontPicker";
 
 export default function SettingsPanel({ settings, onChange }) {
   const update = (field, value) => {
     onChange({ ...settings, [field]: value });
+  };
+
+  const updateTypography = (role, fontName) => {
+    onChange({ ...settings, typography: { ...settings.typography, [role]: fontName } });
   };
 
   const handleCustomSeparator = async (e) => {
@@ -207,6 +212,31 @@ export default function SettingsPanel({ settings, onChange }) {
             </Label>
           </div>
         </RadioGroup>
+      </div>
+
+      {/* Typography */}
+      <div className="space-y-3">
+        <Label className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Tipografías</Label>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Selecciona una fuente para cada elemento. La previsualización se actualiza en tiempo real.
+        </p>
+        <div className="space-y-3 relative">
+          <FontPicker
+            label="Cuerpo de texto"
+            value={settings.typography?.body || 'EB Garamond'}
+            onChange={(v) => updateTypography('body', v)}
+          />
+          <FontPicker
+            label="Títulos de capítulo"
+            value={settings.typography?.chapter || 'EB Garamond'}
+            onChange={(v) => updateTypography('chapter', v)}
+          />
+          <FontPicker
+            label="Portada / Título principal"
+            value={settings.typography?.title || 'EB Garamond'}
+            onChange={(v) => updateTypography('title', v)}
+          />
+        </div>
       </div>
 
       {/* Scene Separator */}

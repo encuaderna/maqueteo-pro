@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SCENE_SEPARATORS } from "@/lib/formatting-utils";
+
+function loadGoogleFont(fontName) {
+  if (!fontName) return;
+  const id = `gfont-preview-${fontName.replace(/\s+/g, "-")}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;700&display=swap`;
+  document.head.appendChild(link);
+}
 
 function PageShell({ settings, pageNumber, isRight, headerLeft, headerRight, showHeader, children }) {
   const bg = settings.paperColor === "cream" ? "#FDF5E6" : "#FFFFFF";
   const fontSize = settings.fontSize;
   const lineHeight = settings.lineSpacing;
+  const bodyFont = settings.typography?.body || 'EB Garamond';
 
   return (
     <div
@@ -15,7 +27,7 @@ function PageShell({ settings, pageNumber, isRight, headerLeft, headerRight, sho
         width: 280,
         height: 380,
         backgroundColor: bg,
-        fontFamily: "'EB Garamond', 'Garamond', 'Georgia', serif",
+        fontFamily: `'${bodyFont}', 'Garamond', 'Georgia', serif`,
         fontSize: `${(fontSize / 11) * 9}px`,
       }}
     >
@@ -127,6 +139,15 @@ function renderParagraphs(text, settings, isChapterStart) {
 export default function BookPreview({ chapters, metadata, settings }) {
   const [currentSpread, setCurrentSpread] = useState(0);
 
+  // Load selected fonts whenever they change
+  useEffect(() => {
+    const fonts = settings.typography || {};
+    [fonts.body, fonts.chapter, fonts.title].filter(Boolean).forEach(loadGoogleFont);
+  }, [settings.typography]);
+
+  const titleFont = settings.typography?.title || 'EB Garamond';
+  const chapterFont = settings.typography?.chapter || 'EB Garamond';
+
   // Build all preview pages
   const pages = [];
 
@@ -138,7 +159,7 @@ export default function BookPreview({ chapters, metadata, settings }) {
     type: "halftitle",
     content: (
       <div className="h-full flex items-center justify-center">
-        <h1 style={{ fontSize: "1.4em", fontWeight: 400, textAlign: "center", letterSpacing: "0.05em" }}>
+        <h1 style={{ fontSize: "1.4em", fontWeight: 400, textAlign: "center", letterSpacing: "0.05em", fontFamily: `'${titleFont}', serif` }}>
           {metadata.title || "Sin título"}
         </h1>
       </div>
@@ -153,7 +174,7 @@ export default function BookPreview({ chapters, metadata, settings }) {
     type: "title",
     content: (
       <div className="h-full flex flex-col items-center justify-center text-center gap-3">
-        <h1 style={{ fontSize: "1.6em", fontWeight: 400, letterSpacing: "0.08em", lineHeight: 1.3 }}>
+        <h1 style={{ fontSize: "1.6em", fontWeight: 400, letterSpacing: "0.08em", lineHeight: 1.3, fontFamily: `'${titleFont}', serif` }}>
           {metadata.title || "Sin título"}
         </h1>
         <div style={{ width: 40, height: 1, backgroundColor: "#ccc" }} />
@@ -255,11 +276,11 @@ export default function BookPreview({ chapters, metadata, settings }) {
       content: (
         <div className="h-full flex flex-col pt-12">
           <div className="text-center mb-4">
-            <p style={{ fontSize: "0.7em", letterSpacing: "0.2em", fontVariant: "small-caps", color: "#999" }}>
+            <p style={{ fontSize: "0.7em", letterSpacing: "0.2em", fontVariant: "small-caps", color: "#999", fontFamily: `'${chapterFont}', serif` }}>
               Capítulo {chapter.number}
             </p>
             {chapter.title && (
-              <h2 style={{ fontSize: "1.1em", fontWeight: 400, marginTop: 4, letterSpacing: "0.03em" }}>
+              <h2 style={{ fontSize: "1.1em", fontWeight: 400, marginTop: 4, letterSpacing: "0.03em", fontFamily: `'${chapterFont}', serif` }}>
                 {chapter.title}
               </h2>
             )}
