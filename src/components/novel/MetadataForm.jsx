@@ -86,7 +86,7 @@ export default function MetadataForm({ metadata, onChange }) {
           type="url"
           value={metadata.original_link || ""}
           onChange={(e) => update("original_link", e.target.value)}
-          placeholder="https://archiveofourown.org/works/..."
+          placeholder="https://..."
           className="h-9 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
           autoComplete="url"
         />

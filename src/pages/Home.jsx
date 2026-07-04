@@ -417,7 +417,7 @@ export default function Home() {
             </p>
             <div className="grid grid-cols-3 gap-3 mt-6 text-left">
               {[
-                { step: "1", label: "Pega el texto", desc: "Desde AO3 u otra fuente" },
+                { step: "1", label: "Pega el texto", desc: "Desde cualquier fuente" },
                 { step: "2", label: "Ajusta los detalles", desc: "Título, autor, formato" },
                 { step: "3", label: "Descarga", desc: "PDF o Word listo para imprimir" },
               ].map(({ step, label, desc }) => (
