@@ -345,7 +345,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
         {selectMode ? (
           <div className="space-y-1.5">
             <p className="text-[11px] text-muted-foreground">
-              {selectedIds.size === 0 ? "Toca un proyecto para seleccionar" : `${selectedIds.size} seleccionado${selectedIds.size > 1 ? "s" : ""}`}
+              {selectedIds.size === 0 ? t.tapToSelect : t.selectedCount(selectedIds.size)}
             </p>
             <Button
               size="sm" className="text-xs h-8 w-full gap-1.5"
@@ -353,7 +353,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
               onClick={() => setShowBulkExport(true)}
             >
               <Download className="w-3.5 h-3.5" />
-              Exportar seleccionados
+              {t.exportSelected}
             </Button>
           </div>
         ) : (
@@ -363,7 +363,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
             onClick={handleSave} disabled={saving} aria-busy={saving}
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-            {saving ? "Guardando…" : "Guardar"}
+            {saving ? t.savingProject : t.saveProject}
           </Button>
         )}
 
@@ -383,7 +383,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
             </div>
           ) : projects.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-6 leading-relaxed px-2">
-              Guarda tu primer proyecto para verlo aquí.
+              {t.noProjectsYet}
             </p>
           ) : (
             <>
@@ -409,7 +409,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
               {uncategorized.length > 0 && (
                 <div>
                   {collections.length > 0 && (
-                    <p className="text-[11px] font-semibold text-muted-foreground/60 px-1 py-1 uppercase tracking-wider">Sin colección</p>
+                    <p className="text-[11px] font-semibold text-muted-foreground/60 px-1 py-1 uppercase tracking-wider">{t.noCollection}</p>
                   )}
                   <div className="space-y-1">
                     {uncategorized.map(p => (
