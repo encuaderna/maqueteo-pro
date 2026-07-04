@@ -1,0 +1,53 @@
+{
+  "name": "FormattingProject",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "year": {
+      "type": "string"
+    },
+    "fandom": {
+      "type": "string"
+    },
+    "pairings": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "original_link": {
+      "type": "string"
+    },
+    "warnings": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "formatting",
+        "ready"
+      ],
+      "default": "draft"
+    },
+    "word_count": {
+      "type": "number",
+      "default": 0
+    },
+    "settings": {
+      "type": "object"
+    },
+    "text_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

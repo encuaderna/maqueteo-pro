@@ -90,3 +90,7 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+.font-serif {
+  font-family: 'EB Garamond', 'Garamond', 'Georgia', serif;
+}
