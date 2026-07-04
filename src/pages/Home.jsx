@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, Settings, FileText, Loader2 } from "lucide-react";
+import { BookOpen, Download, Eye, Settings, FileText, Loader2, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { parseChapters, countWords, DEFAULT_SETTINGS } from "@/lib/formatting-utils";
@@ -26,6 +27,7 @@ export default function Home() {
   });
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingDocx, setIsGeneratingDocx] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
   const [showPreview, setShowPreview] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
@@ -138,6 +140,39 @@ export default function Home() {
     }
   }, [text, metadata, settings, chapters, toast]);
 
+  const handleGenerateDocx = useCallback(async () => {
+    if (!text.trim()) {
+      toast({ title: "Sin texto", description: "Pega el texto de tu novela primero.", variant: "destructive" });
+      return;
+    }
+    if (!metadata.title) {
+      toast({ title: "Sin título", description: "Ingresa al menos el título del libro.", variant: "destructive" });
+      return;
+    }
+    setIsGeneratingDocx(true);
+    try {
+      const response = await base44.functions.invoke("generateBookDocx", {
+        chapters,
+        metadata,
+        settings,
+      });
+      const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${metadata.title || "libro"}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: "¡Listo!", description: "Tu libro Word se está descargando." });
+    } catch (err) {
+      toast({ title: "Error al generar Word", description: err.message || "Intenta de nuevo.", variant: "destructive" });
+    } finally {
+      setIsGeneratingDocx(false);
+    }
+  }, [text, metadata, settings, chapters, toast]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -174,19 +209,46 @@ export default function Home() {
               <Eye className="w-3.5 h-3.5 mr-1.5" />
               {showPreview ? "Ocultar" : "Vista previa"}
             </Button>
-            <Button
-              size="sm"
-              className="text-xs h-8"
-              onClick={handleGeneratePdf}
-              disabled={isGenerating || !text}
-            >
-              {isGenerating ? (
-                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-              ) : (
-                <Download className="w-3.5 h-3.5 mr-1.5" />
-              )}
-              {isGenerating ? "Generando..." : "Descargar PDF"}
-            </Button>
+            <div className="flex items-center">
+              <Button
+                size="sm"
+                className="text-xs h-8 rounded-r-none border-r border-primary-foreground/20"
+                onClick={handleGeneratePdf}
+                disabled={isGenerating || isGeneratingDocx || !text}
+              >
+                {isGenerating ? (
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                )}
+                {isGenerating ? "Generando..." : "Descargar PDF"}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="text-xs h-8 rounded-l-none px-2"
+                    disabled={isGenerating || isGeneratingDocx || !text}
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating}>
+                    <Download className="w-3.5 h-3.5 mr-2" />
+                    Descargar PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleGenerateDocx} disabled={isGeneratingDocx}>
+                    {isGeneratingDocx ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                    ) : (
+                      <FileText className="w-3.5 h-3.5 mr-2" />
+                    )}
+                    {isGeneratingDocx ? "Generando..." : "Descargar Word (.docx)"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
