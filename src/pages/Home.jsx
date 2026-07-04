@@ -50,21 +50,21 @@ export default function Home() {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
 
   const handleRestoreVersion = useCallback((entry) => {
-    const { text: t, metadata: m, settings: s } = entry.snapshot;
-    setText(t || "");
+    const { text: tv, metadata: m, settings: s } = entry.snapshot;
+    setText(tv || "");
     setMetadata(m || {});
     setSettings({ ...DEFAULT_SETTINGS, ...(s || {}) });
     setShowHistory(false);
-    toast({ title: "Versión restaurada", description: `Restaurado desde ${new Date(entry.timestamp).toLocaleTimeString("es-CL")}` });
-  }, [toast]);
+    toast({ title: t.toastVersionRestored, description: t.toastVersionRestoredDesc(new Date(entry.timestamp).toLocaleTimeString()) });
+  }, [toast, t]);
 
   const handleImportHistory = useCallback(async (file) => {
     if (!file) return;
     try {
       const count = await importHistory(file);
-      toast({ title: "Historial importado", description: `${count} versiones cargadas.` });
+      toast({ title: t.toastHistoryImported, description: t.toastHistoryImportedDesc(count) });
     } catch {
-      toast({ title: "Error al importar", description: "El archivo no es válido.", variant: "destructive" });
+      toast({ title: t.toastHistoryImportError, description: t.toastHistoryImportErrorDesc, variant: "destructive" });
     }
   }, [importHistory, toast]);
 
@@ -331,6 +331,7 @@ export default function Home() {
             </div>
 
             <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
+            <LanguageSelector />
             <ShortcutsHint />
             <AccessibilityControls />
           </div>
@@ -355,15 +356,15 @@ export default function Home() {
               <TabsList className="w-full grid grid-cols-3 h-9 mb-4" aria-label="Secciones del editor">
                 <TabsTrigger value="text" className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
                   <FileText className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-                  Texto
+                  {t.tabText}
                 </TabsTrigger>
                 <TabsTrigger value="metadata" className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
                   <BookOpen className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-                  Metadatos
+                  {t.tabMetadata}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
                   <Settings className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-                  Opciones
+                  {t.tabSettings}
                 </TabsTrigger>
               </TabsList>
 
@@ -391,20 +392,20 @@ export default function Home() {
               <section aria-label="Capítulos detectados" className="mt-4 rounded-xl border border-border overflow-hidden">
                 <div className="px-4 py-2.5 bg-muted/40 border-b border-border flex items-center justify-between">
                   <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {chapters.length} {chapters.length === 1 ? "capítulo detectado" : "capítulos detectados"}
+                    {t.chaptersDetected(chapters.length)}
                   </h2>
-                  <span className="text-xs text-muted-foreground tabular-nums">{wordCount.toLocaleString()} palabras en total</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">{t.totalWords(wordCount.toLocaleString())}</span>
                 </div>
                 <ol className="divide-y divide-border/60">
                   {chapters.map((ch, i) => (
                     <li key={i} className="flex items-center justify-between px-4 py-2 text-sm hover:bg-muted/30 transition-colors">
                       <span className="flex items-center gap-2">
                         <span className="text-xs font-medium text-muted-foreground tabular-nums w-8">#{ch.number}</span>
-                        <span className="text-foreground truncate max-w-[200px]">{ch.title || <span className="text-muted-foreground italic">Sin título</span>}</span>
-                        {ch.notes && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">notas</span>}
+                        <span className="text-foreground truncate max-w-[200px]">{ch.title || <span className="text-muted-foreground italic">{t.noChapterTitle}</span>}</span>
+                        {ch.notes && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">{t.notes}</span>}
                       </span>
                       <span className="text-xs text-muted-foreground tabular-nums flex-shrink-0 ml-4">
-                        {countWords(ch.content).toLocaleString()} pal.
+                        {countWords(ch.content).toLocaleString()} {t.wordsAbbr}
                       </span>
                     </li>
                   ))}
@@ -417,20 +418,20 @@ export default function Home() {
           {text && (
             <aside aria-label="Estadísticas del texto" className="lg:w-44 flex-shrink-0 hidden lg:block">
               <div className="sticky top-20 rounded-xl border border-border bg-card p-4 space-y-4">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estadísticas</h2>
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.statsTitle}</h2>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Palabras</p>
-                    <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{wordCount.toLocaleString("es-CL")}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{t.statWords}</p>
+                    <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{wordCount.toLocaleString()}</p>
                   </div>
                   <div className="h-px bg-border" />
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Capítulos</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{t.statChapters}</p>
                     <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{chapters.length}</p>
                   </div>
                   <div className="h-px bg-border" />
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Lectura est.</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{t.statReadingTime}</p>
                     {(() => {
                       const mins = Math.ceil(wordCount / 200);
                       const h = Math.floor(mins / 60);
@@ -440,7 +441,7 @@ export default function Home() {
                           <p className="text-2xl font-heading font-semibold tabular-nums leading-none">
                             {h > 0 ? `${h}h ${m}m` : `${m}m`}
                           </p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">a 200 pal/min</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{t.statReadingRate}</p>
                         </>
                       );
                     })()}
@@ -449,11 +450,11 @@ export default function Home() {
                     <>
                       <div className="h-px bg-border" />
                       <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Promedio / cap.</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{t.statAvgPerChapter}</p>
                         <p className="text-lg font-heading font-semibold tabular-nums leading-none">
-                          {Math.round(wordCount / chapters.length).toLocaleString("es-CL")}
+                          {Math.round(wordCount / chapters.length).toLocaleString()}
                         </p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">palabras</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{t.statWordsUnit}</p>
                       </div>
                     </>
                   )}
@@ -468,7 +469,7 @@ export default function Home() {
               <div className="sticky top-20">
                 <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
                   <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4 text-center">
-                    Vista previa del libro
+                    {t.previewTitle}
                   </h2>
                   <BookPreview
                     chapters={chapters}
@@ -484,18 +485,18 @@ export default function Home() {
         {/* Empty state — shown only when no text and no chapters */}
         {!text && (
           <section aria-label="Bienvenida" className="mt-10 text-center max-w-lg mx-auto">
-            <h2 className="text-base font-heading font-semibold mb-1">Formatea tu novela para impresión</h2>
+            <h2 className="text-base font-heading font-semibold mb-1">{t.emptyStateTitle}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Pega el texto, completa los metadatos y descarga un PDF o Word con tipografía profesional.
+              {t.emptyStateDesc}
             </p>
             <div className="grid grid-cols-3 gap-3 mt-6 text-left">
               {[
-                { step: "1", label: "Pega el texto", desc: "Desde cualquier fuente" },
-                { step: "2", label: "Ajusta los detalles", desc: "Título, autor, formato" },
-                { step: "3", label: "Descarga", desc: "PDF o Word listo para imprimir" },
+                { step: "1", label: t.step1Label, desc: t.step1Desc },
+                { step: "2", label: t.step2Label, desc: t.step2Desc },
+                { step: "3", label: t.step3Label, desc: t.step3Desc },
               ].map(({ step, label, desc }) => (
                 <div key={step} className="rounded-xl border border-border bg-card p-3">
-                  <div className="text-xs font-bold text-muted-foreground mb-1">Paso {step}</div>
+                  <div className="text-xs font-bold text-muted-foreground mb-1">{t.stepPrefix} {step}</div>
                   <div className="text-sm font-medium text-foreground">{label}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
                 </div>

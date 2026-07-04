@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLang } from "@/lib/LanguageContext";
 import {
   Plus, Trash2, Clock, FolderOpen, Save, Loader2,
   Folder, FolderPlus, ChevronDown, ChevronRight, X, Check,
@@ -26,6 +27,7 @@ function ColorDot({ color, className = "" }) {
 }
 
 function NewCollectionForm({ onSave, onCancel }) {
+  const { t } = useLang();
   const [name, setName] = useState("");
   const [color, setColor] = useState("gray");
   const [saving, setSaving] = useState(false);
@@ -48,7 +50,7 @@ function NewCollectionForm({ onSave, onCancel }) {
         value={name}
         onChange={e => setName(e.target.value)}
         onKeyDown={e => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") onCancel(); }}
-        placeholder="Nombre de la colección"
+        placeholder={t.collectionName}
         className="h-7 text-xs"
       />
       <div className="flex items-center gap-1.5 flex-wrap">
@@ -64,7 +66,7 @@ function NewCollectionForm({ onSave, onCancel }) {
       <div className="flex gap-1.5">
         <Button size="sm" className="h-6 text-xs flex-1" onClick={handleSave} disabled={!name.trim() || saving}>
           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-          Crear
+          {t.create}
         </Button>
         <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={onCancel}>
           <X className="w-3 h-3" />
@@ -75,6 +77,7 @@ function NewCollectionForm({ onSave, onCancel }) {
 }
 
 function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, collections, selectMode, selected, onToggleSelect }) {
+  const { t } = useLang();
   const [showMove, setShowMove] = useState(false);
 
   return (
@@ -119,7 +122,7 @@ function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, 
             className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded mt-0.5 ${
               isActive ? "hover:bg-primary-foreground/20" : "hover:bg-destructive/10 hover:text-destructive"
             }`}
-            aria-label={`Eliminar "${project.title || "Sin título"}"`}
+            aria-label={t.deleteProject(project.title || t.withoutTitle)}
           >
             <Trash2 className="w-3 h-3" aria-hidden="true" />
           </button>
@@ -141,9 +144,9 @@ function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, 
               <div className="absolute right-0 top-5 z-10 bg-popover border border-border rounded-lg shadow-md py-1 min-w-[130px]">
                 <button
                   className="w-full text-left px-3 py-1.5 text-xs hover:bg-muted flex items-center gap-2"
-                  onClick={() => { onMoveToCollection(project.id, null); setShowMove(false); }}
-                >
-                  <span className="text-muted-foreground">Sin colección</span>
+                          onClick={() => { onMoveToCollection(project.id, null); setShowMove(false); }}
+                        >
+                          <span className="text-muted-foreground">{t.noCollection}</span>
                 </button>
                 {collections.map(col => (
                   <button
@@ -165,6 +168,7 @@ function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, 
 }
 
 function CollectionGroup({ collection, projects, currentProject, onLoad, onDelete, onDeleteCollection, onMoveToCollection, collections, selectMode, selectedIds, onToggleSelect }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(true);
 
   return (
@@ -180,7 +184,7 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
         <button
           onClick={(e) => { e.stopPropagation(); onDeleteCollection(collection.id); }}
           className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-destructive transition-opacity"
-          aria-label={`Eliminar colección "${collection.name}"`}
+          aria-label={t.deleteCollection(collection.name)}
         >
           <Trash2 className="w-2.5 h-2.5" />
         </button>
@@ -188,7 +192,7 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
       {open && (
         <div className="pl-3 space-y-1 mt-0.5">
           {projects.length === 0 ? (
-            <p className="text-[10px] text-muted-foreground/60 px-2 py-1 italic">Vacía</p>
+            <p className="text-[10px] text-muted-foreground/60 px-2 py-1 italic">{t.emptyCollection}</p>
           ) : projects.map(p => (
             <ProjectItem
               key={p.id}
@@ -210,6 +214,7 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
 }
 
 export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave }) {
+  const { t } = useLang();
   const [projects, setProjects] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -293,32 +298,32 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
-            Proyectos
+            {t.projects}
           </h2>
           <div className="flex items-center gap-0.5">
             {!selectMode && (
               <>
                 <Button
                   variant="ghost" size="icon" className="h-6 w-6"
-                  title="Seleccionar para exportar"
+                  title={t.selectToExport}
                   onClick={() => setSelectMode(true)}
-                  aria-label="Seleccionar proyectos"
+                  aria-label={t.selectToExport}
                 >
                   <PackageOpen className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   variant="ghost" size="icon" className="h-6 w-6"
-                  title="Nueva colección"
+                  title={t.newCollection}
                   onClick={() => setShowNewCollection(v => !v)}
-                  aria-label="Nueva colección"
+                  aria-label={t.newCollection}
                 >
                   <FolderPlus className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   variant="ghost" size="icon" className="h-6 w-6"
-                  title="Nuevo proyecto"
+                  title={t.newProject}
                   onClick={() => { onNew(); fetchAll(); }}
-                  aria-label="Nuevo proyecto"
+                  aria-label={t.newProject}
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </Button>
@@ -327,8 +332,8 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
             {selectMode && (
               <Button
                 variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground"
-                onClick={exitSelectMode} aria-label="Cancelar selección"
-                title="Cancelar"
+                onClick={exitSelectMode} aria-label={t.cancelSelection}
+                title={t.cancelBtn}
               >
                 <X className="w-3.5 h-3.5" />
               </Button>
