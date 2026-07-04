@@ -16,46 +16,48 @@ export default function TextInput({ text, onChange }) {
   return (
     <section aria-label="Texto de la novela" className="space-y-3">
       {!text ? (
-        /* Empty state — guided call to action */
-        <div className="border-2 border-dashed border-border rounded-xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 mx-auto rounded-full bg-muted flex items-center justify-center">
-            <ClipboardPaste className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+        /* Empty state — flujo integrado */
+        <div className="border-2 border-dashed border-border rounded-xl overflow-hidden">
+          {/* Pasos en línea */}
+          <div className="flex items-stretch border-b border-border/60 text-center text-[11px] text-muted-foreground bg-muted/30">
+            {[
+              { n: "1", label: "Pega el texto" },
+              { n: "2", label: "Ajusta detalles" },
+              { n: "3", label: "Previsualiza" },
+              { n: "4", label: "Exporta" },
+            ].map((s, i, arr) => (
+              <div key={s.n} className={`flex-1 py-2 px-1 flex flex-col items-center gap-0.5 ${i === 0 ? "text-foreground font-medium bg-muted/60" : ""} ${i < arr.length - 1 ? "border-r border-border/40" : ""}`}>
+                <span className={`text-[10px] font-bold ${i === 0 ? "text-primary" : "text-muted-foreground/50"}`}>{s.n}</span>
+                <span>{s.label}</span>
+              </div>
+            ))}
           </div>
-          <div>
-            <p className="text-sm font-medium text-foreground mb-1">Pega el texto de tu novela</p>
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-              Pega el texto copiado desde su plataforma de origen aquí. El sistema detectará los capítulos automáticamente.
+          {/* CTA */}
+          <div className="p-6 text-center space-y-3">
+            <div className="w-10 h-10 mx-auto rounded-full bg-muted flex items-center justify-center">
+              <ClipboardPaste className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+              Pega tu texto — los capítulos se detectan automáticamente.
             </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button size="sm" onClick={handlePaste} className="text-xs gap-1.5" aria-label="Pegar texto desde el portapapeles">
+                <ClipboardPaste className="w-3.5 h-3.5" aria-hidden="true" />
+                Pegar del portapapeles
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs gap-1.5" onClick={() => textareaRef.current?.focus()} aria-label="Escribir texto directamente">
+                <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" />
+                Escribir aquí
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Button
-              size="sm"
-              onClick={handlePaste}
-              className="text-xs gap-1.5"
-              aria-label="Pegar texto desde el portapapeles"
-            >
-              <ClipboardPaste className="w-3.5 h-3.5" aria-hidden="true" />
-              Pegar del portapapeles
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs gap-1.5"
-              onClick={() => textareaRef.current?.focus()}
-              aria-label="Escribir texto directamente"
-            >
-              <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" />
-              Escribir aquí
-            </Button>
-          </div>
-          {/* Hidden textarea still focusable for keyboard/screen reader users */}
           <Textarea
             ref={textareaRef}
             id="novel-text"
             value={text}
             onChange={(e) => onChange(e.target.value)}
             placeholder="O empieza a escribir directamente..."
-            className="min-h-[120px] text-sm leading-relaxed font-serif resize-y mt-2"
+            className="min-h-[100px] text-sm leading-relaxed font-serif resize-y border-t border-border/40 rounded-none border-x-0 border-b-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             aria-label="Área de texto de la novela"
           />
         </div>
@@ -84,7 +86,7 @@ export default function TextInput({ text, onChange }) {
             value={text}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Pega aquí el texto de tu novela..."
-            className="min-h-[400px] text-sm leading-relaxed font-serif resize-y"
+            className="min-h-[520px] text-sm leading-relaxed font-serif resize-y"
             aria-label="Texto de la novela"
           />
 

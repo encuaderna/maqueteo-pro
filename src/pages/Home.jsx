@@ -495,28 +495,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Empty state — shown only when no text and no chapters */}
-        {!text && (
-          <section aria-label="Bienvenida" className="mt-10 text-center max-w-lg mx-auto">
-            <h2 className="text-base font-heading font-semibold mb-1">{t.emptyStateTitle}</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t.emptyStateDesc}
-            </p>
-            <div className="grid grid-cols-3 gap-3 mt-6 text-left">
-              {[
-                { step: "1", label: t.step1Label, desc: t.step1Desc },
-                { step: "2", label: t.step2Label, desc: t.step2Desc },
-                { step: "3", label: t.step3Label, desc: t.step3Desc },
-              ].map(({ step, label, desc }) => (
-                <div key={step} className="rounded-xl border border-border bg-card p-3">
-                  <div className="text-xs font-bold text-muted-foreground mb-1">{t.stepPrefix} {step}</div>
-                  <div className="text-sm font-medium text-foreground">{label}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+
       </div>
 
       {/* Review panel */}
