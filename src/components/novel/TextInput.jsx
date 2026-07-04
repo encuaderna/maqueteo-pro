@@ -24,7 +24,7 @@ export default function TextInput({ text, onChange }) {
           <div>
             <p className="text-sm font-medium text-foreground mb-1">Pega el texto de tu novela</p>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-              Copia el texto desde AO3 u otra fuente y pégalo aquí. Los capítulos se detectan automáticamente.
+              Pega el texto copiado desde su plataforma de origen aquí. El sistema detectará los capítulos automáticamente.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
