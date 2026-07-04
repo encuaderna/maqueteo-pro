@@ -9,6 +9,7 @@ import MetadataForm from "@/components/novel/MetadataForm";
 import SettingsPanel from "@/components/novel/SettingsPanel";
 import TextInput from "@/components/novel/TextInput";
 import BookPreview from "@/components/novel/BookPreview";
+import ProjectsPanel from "@/components/novel/ProjectsPanel";
 
 export default function Home() {
   const { toast } = useToast();
@@ -27,9 +28,74 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
   const [showPreview, setShowPreview] = useState(false);
+  const [currentProject, setCurrentProject] = useState(null);
 
   const chapters = useMemo(() => parseChapters(text), [text]);
   const wordCount = useMemo(() => countWords(text), [text]);
+
+  const handleSaveProject = useCallback(async () => {
+    if (!metadata.title && !text) {
+      toast({ title: "Proyecto vacío", description: "Agrega al menos un título o texto.", variant: "destructive" });
+      return;
+    }
+    const data = {
+      title: metadata.title || "Sin título",
+      author: metadata.author,
+      year: metadata.year,
+      fandom: metadata.fandom,
+      pairings: metadata.pairings,
+      summary: metadata.summary,
+      original_link: metadata.original_link,
+      warnings: metadata.warnings,
+      word_count: countWords(text),
+      settings,
+      text_url: null, // text stored in settings blob for now
+    };
+    // Store full text in settings object to avoid large field issues
+    data.settings = { ...settings, _text: text };
+
+    try {
+      if (currentProject?.id) {
+        await base44.entities.FormattingProject.update(currentProject.id, data);
+        setCurrentProject(prev => ({ ...prev, ...data }));
+        toast({ title: "Proyecto guardado" });
+      } else {
+        const created = await base44.entities.FormattingProject.create(data);
+        setCurrentProject(created);
+        toast({ title: "Proyecto guardado" });
+      }
+    } catch (e) {
+      toast({ title: "Error al guardar", description: e.message, variant: "destructive" });
+    }
+  }, [metadata, text, settings, currentProject, toast]);
+
+  const handleLoadProject = useCallback((project) => {
+    const s = project.settings || {};
+    const { _text, ...cleanSettings } = s;
+    setText(_text || "");
+    setMetadata({
+      title: project.title || "",
+      author: project.author || "",
+      year: project.year || "",
+      fandom: project.fandom || "",
+      pairings: project.pairings || "",
+      summary: project.summary || "",
+      original_link: project.original_link || "",
+      warnings: project.warnings || "",
+    });
+    setSettings({ ...DEFAULT_SETTINGS, ...cleanSettings });
+    setCurrentProject(project);
+    setActiveTab("text");
+    toast({ title: `"${project.title}" cargado` });
+  }, [toast]);
+
+  const handleNewProject = useCallback(() => {
+    setText("");
+    setMetadata({ title: "", author: "", year: "", fandom: "", pairings: "", summary: "", original_link: "", warnings: "" });
+    setSettings(DEFAULT_SETTINGS);
+    setCurrentProject(null);
+    setActiveTab("text");
+  }, []);
 
   const handleGeneratePdf = useCallback(async () => {
     if (!text.trim()) {
@@ -85,6 +151,11 @@ export default function Home() {
             <span className="text-[10px] text-muted-foreground tracking-wider uppercase font-medium px-1.5 py-0.5 bg-muted rounded">
               Formateador
             </span>
+            {currentProject && (
+              <span className="text-xs text-muted-foreground hidden sm:inline truncate max-w-[160px]">
+                / {currentProject.title || "Sin título"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {text && (
@@ -122,6 +193,13 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex flex-col lg:flex-row gap-6">
+          {/* Projects sidebar */}
+          <ProjectsPanel
+            currentProject={currentProject}
+            onLoad={handleLoadProject}
+            onNew={handleNewProject}
+            onSave={handleSaveProject}
+          />
           {/* Left panel: input & config */}
           <div className="flex-1 min-w-0">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
