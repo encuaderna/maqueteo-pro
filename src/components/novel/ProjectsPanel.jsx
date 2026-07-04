@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Plus, Trash2, Clock, FolderOpen, Save, Loader2,
-  Folder, FolderPlus, ChevronDown, ChevronRight, X, Check
+  Folder, FolderPlus, ChevronDown, ChevronRight, X, Check,
+  PackageOpen, Square, CheckSquare, Download
 } from "lucide-react";
+import BulkExportModal from "@/components/novel/BulkExportModal";
 
 const COLORS = [
   { value: "gray",   bg: "bg-gray-400" },
@@ -72,48 +74,60 @@ function NewCollectionForm({ onSave, onCancel }) {
   );
 }
 
-function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, collections }) {
+function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, collections, selectMode, selected, onToggleSelect }) {
   const [showMove, setShowMove] = useState(false);
 
   return (
     <div className="relative group">
       <button
-        onClick={() => onLoad(project)}
+        onClick={() => selectMode ? onToggleSelect(project.id) : onLoad(project)}
         className={`w-full text-left rounded-lg px-3 py-2.5 border transition-colors flex items-start justify-between gap-2 ${
-          isActive
+          selected
+            ? "bg-primary/10 border-primary"
+            : isActive
             ? "bg-primary text-primary-foreground border-primary"
             : "bg-card border-border hover:bg-muted/60"
         }`}
         aria-current={isActive ? "true" : undefined}
+        aria-pressed={selectMode ? selected : undefined}
       >
-        <div className="flex-1 min-w-0">
-          <p className={`text-xs font-medium truncate leading-snug ${isActive ? "text-primary-foreground" : "text-foreground"}`}>
-            {project.title || "Sin título"}
-          </p>
-          {project.author && (
-            <p className={`text-[10px] truncate mt-0.5 ${isActive ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-              {project.author}
-            </p>
+        <div className="flex items-start gap-2 flex-1 min-w-0">
+          {selectMode && (
+            <span className="mt-0.5 flex-shrink-0 text-primary">
+              {selected ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5 text-muted-foreground" />}
+            </span>
           )}
-          <div className={`flex items-center gap-1 mt-1 text-[10px] ${isActive ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
-            <Clock className="w-2.5 h-2.5" aria-hidden="true" />
-            {new Date(project.updated_date).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })}
-            {project.word_count > 0 && <span>· {(project.word_count / 1000).toFixed(1)}k</span>}
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs font-medium truncate leading-snug ${isActive && !selected ? "text-primary-foreground" : "text-foreground"}`}>
+              {project.title || "Sin título"}
+            </p>
+            {project.author && (
+              <p className={`text-[10px] truncate mt-0.5 ${isActive && !selected ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                {project.author}
+              </p>
+            )}
+            <div className={`flex items-center gap-1 mt-1 text-[10px] ${isActive && !selected ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+              <Clock className="w-2.5 h-2.5" aria-hidden="true" />
+              {new Date(project.updated_date).toLocaleDateString("es-CL", { day: "2-digit", month: "short" })}
+              {project.word_count > 0 && <span>· {(project.word_count / 1000).toFixed(1)}k</span>}
+            </div>
           </div>
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-          className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded mt-0.5 ${
-            isActive ? "hover:bg-primary-foreground/20" : "hover:bg-destructive/10 hover:text-destructive"
-          }`}
-          aria-label={`Eliminar "${project.title || "Sin título"}"`}
-        >
-          <Trash2 className="w-3 h-3" aria-hidden="true" />
-        </button>
+        {!selectMode && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
+            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded mt-0.5 ${
+              isActive ? "hover:bg-primary-foreground/20" : "hover:bg-destructive/10 hover:text-destructive"
+            }`}
+            aria-label={`Eliminar "${project.title || "Sin título"}"`}
+          >
+            <Trash2 className="w-3 h-3" aria-hidden="true" />
+          </button>
+        )}
       </button>
 
       {/* Move to collection */}
-      {collections.length > 0 && (
+      {!selectMode && collections.length > 0 && (
         <div className="absolute right-6 top-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="relative">
             <button
@@ -150,7 +164,7 @@ function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, 
   );
 }
 
-function CollectionGroup({ collection, projects, currentProject, onLoad, onDelete, onDeleteCollection, onMoveToCollection, collections }) {
+function CollectionGroup({ collection, projects, currentProject, onLoad, onDelete, onDeleteCollection, onMoveToCollection, collections, selectMode, selectedIds, onToggleSelect }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -184,6 +198,9 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
               onDelete={onDelete}
               onMoveToCollection={onMoveToCollection}
               collections={collections}
+              selectMode={selectMode}
+              selected={selectedIds.has(p.id)}
+              onToggleSelect={onToggleSelect}
             />
           ))}
         </div>
@@ -198,6 +215,22 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showNewCollection, setShowNewCollection] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [showBulkExport, setShowBulkExport] = useState(false);
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -263,33 +296,71 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
             Proyectos
           </h2>
           <div className="flex items-center gap-0.5">
-            <Button
-              variant="ghost" size="icon" className="h-6 w-6"
-              title="Nueva colección"
-              onClick={() => setShowNewCollection(v => !v)}
-              aria-label="Nueva colección"
-            >
-              <FolderPlus className="w-3.5 h-3.5" />
-            </Button>
-            <Button
-              variant="ghost" size="icon" className="h-6 w-6"
-              title="Nuevo proyecto"
-              onClick={() => { onNew(); fetchAll(); }}
-              aria-label="Nuevo proyecto"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </Button>
+            {!selectMode && (
+              <>
+                <Button
+                  variant="ghost" size="icon" className="h-6 w-6"
+                  title="Seleccionar para exportar"
+                  onClick={() => setSelectMode(true)}
+                  aria-label="Seleccionar proyectos"
+                >
+                  <PackageOpen className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant="ghost" size="icon" className="h-6 w-6"
+                  title="Nueva colección"
+                  onClick={() => setShowNewCollection(v => !v)}
+                  aria-label="Nueva colección"
+                >
+                  <FolderPlus className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant="ghost" size="icon" className="h-6 w-6"
+                  title="Nuevo proyecto"
+                  onClick={() => { onNew(); fetchAll(); }}
+                  aria-label="Nuevo proyecto"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </Button>
+              </>
+            )}
+            {selectMode && (
+              <Button
+                variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground"
+                onClick={exitSelectMode} aria-label="Cancelar selección"
+                title="Cancelar"
+              >
+                <X className="w-3.5 h-3.5" />
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Save current */}
-        <Button
-          size="sm" variant="outline" className="text-xs h-8 w-full gap-1.5"
-          onClick={handleSave} disabled={saving} aria-busy={saving}
-        >
-          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-          {saving ? "Guardando…" : "Guardar"}
-        </Button>
+        {/* Select mode toolbar */}
+        {selectMode ? (
+          <div className="space-y-1.5">
+            <p className="text-[11px] text-muted-foreground">
+              {selectedIds.size === 0 ? "Toca un proyecto para seleccionar" : `${selectedIds.size} seleccionado${selectedIds.size > 1 ? "s" : ""}`}
+            </p>
+            <Button
+              size="sm" className="text-xs h-8 w-full gap-1.5"
+              disabled={selectedIds.size === 0}
+              onClick={() => setShowBulkExport(true)}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Exportar seleccionados
+            </Button>
+          </div>
+        ) : (
+          /* Save current */
+          <Button
+            size="sm" variant="outline" className="text-xs h-8 w-full gap-1.5"
+            onClick={handleSave} disabled={saving} aria-busy={saving}
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            {saving ? "Guardando…" : "Guardar"}
+          </Button>
+        )}
 
         {/* New collection form */}
         {showNewCollection && (
@@ -323,6 +394,9 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
                   onDeleteCollection={handleDeleteCollection}
                   onMoveToCollection={handleMoveToCollection}
                   collections={collections}
+                  selectMode={selectMode}
+                  selectedIds={selectedIds}
+                  onToggleSelect={toggleSelect}
                 />
               ))}
 
@@ -342,6 +416,9 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
                         onDelete={handleDelete}
                         onMoveToCollection={handleMoveToCollection}
                         collections={collections}
+                        selectMode={selectMode}
+                        selected={selectedIds.has(p.id)}
+                        onToggleSelect={toggleSelect}
                       />
                     ))}
                   </div>
@@ -351,6 +428,13 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
           )}
         </div>
       </div>
+
+      {showBulkExport && (
+        <BulkExportModal
+          projects={projects.filter(p => selectedIds.has(p.id))}
+          onClose={() => { setShowBulkExport(false); exitSelectMode(); }}
+        />
+      )}
     </div>
   );
 }
