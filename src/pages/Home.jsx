@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, Settings, FileText, Loader2, History, SplitSquareHorizontal } from "lucide-react";
+import { BookOpen, Download, Eye, FileText, Loader2, History, SplitSquareHorizontal, ChevronDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { parseChapters, countWords, DEFAULT_SETTINGS } from "@/lib/formatting-utils";
@@ -10,17 +10,21 @@ import SettingsPanel from "@/components/novel/SettingsPanel";
 import TextInput from "@/components/novel/TextInput";
 import BookPreview from "@/components/novel/BookPreview";
 import ProjectsPanel from "@/components/novel/ProjectsPanel";
-import AccessibilityControls from "@/components/novel/AccessibilityControls";
 import HistoryPanel from "@/components/novel/HistoryPanel";
 import ReviewPanel from "@/components/novel/ReviewPanel";
 import { useLocalHistory } from "@/hooks/useLocalHistory";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import ShortcutsHint from "@/components/novel/ShortcutsHint";
 import QuickNotes from "@/components/novel/QuickNotes";
-import LanguageSelector from "@/components/novel/LanguageSelector";
 import KanbanBoard from "@/components/novel/KanbanBoard";
 import InstallPWA from "@/components/InstallPWA";
+import SettingsMenu from "@/components/novel/SettingsMenu";
 import { useLang } from "@/lib/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Home() {
   const { toast } = useToast();
@@ -312,43 +316,37 @@ export default function Home() {
               {showPreview ? t.hidePreview : t.showPreview}
             </Button>
 
-            {/* Download buttons */}
-            <div className="flex items-center gap-2" role="group" aria-label="Opciones de descarga">
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs h-8"
-                onClick={handleGenerateDocx}
-                disabled={isGenerating || isGeneratingDocx || !text}
-                aria-busy={isGeneratingDocx}
-              >
-                {isGeneratingDocx ? (
-                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-                ) : (
-                  <FileText className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-                )}
-                {isGeneratingDocx ? t.generatingWord : "Word"}
-              </Button>
-              <Button
-                size="sm"
-                className="text-xs h-8"
-                onClick={handleGeneratePdf}
-                disabled={isGenerating || isGeneratingDocx || !text}
-                aria-busy={isGenerating}
-              >
-                {isGenerating ? (
-                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-                ) : (
-                  <Download className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-                )}
-                {isGenerating ? t.generatingPdf : "PDF"}
-              </Button>
-            </div>
+            {/* Export dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="text-xs h-8 gap-1.5"
+                  disabled={isGenerating || isGeneratingDocx || !text}
+                  aria-label="Exportar documento"
+                >
+                  {(isGenerating || isGeneratingDocx) ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                  )}
+                  {isGenerating ? t.generatingPdf : isGeneratingDocx ? t.generatingWord : t.exportBtn ?? "Exportar"}
+                  <ChevronDown className="w-3 h-3 opacity-60" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[160px]">
+                <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PDF</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleGenerateDocx} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Word (.docx)</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
-            <LanguageSelector />
-            <ShortcutsHint />
-            <AccessibilityControls />
+            <SettingsMenu />
           </div>
         </div>
       </header>
@@ -378,7 +376,7 @@ export default function Home() {
                   {t.tabMetadata}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
-                  <Settings className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+                  <SplitSquareHorizontal className="w-3.5 h-3.5 mr-1.5 rotate-45" aria-hidden="true" />
                   {t.tabSettings}
                 </TabsTrigger>
               </TabsList>
