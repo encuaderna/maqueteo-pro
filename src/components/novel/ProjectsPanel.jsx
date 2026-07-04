@@ -116,18 +116,18 @@ function ProjectItem({ project, isActive, onLoad, onDelete, onMoveToCollection, 
             </div>
           </div>
         </div>
-        {!selectMode && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-            className={`opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded mt-0.5 ${
-              isActive ? "hover:bg-primary-foreground/20" : "hover:bg-destructive/10 hover:text-destructive"
-            }`}
-            aria-label={t.deleteProject(project.title || t.withoutTitle)}
-          >
-            <Trash2 className="w-3 h-3" aria-hidden="true" />
-          </button>
-        )}
       </button>
+      {!selectMode && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(project.id); }}
+          className={`absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded ${
+            isActive ? "hover:bg-primary-foreground/20" : "hover:bg-destructive/10 hover:text-destructive"
+          }`}
+          aria-label={t.deleteProject(project.title || t.withoutTitle)}
+        >
+          <Trash2 className="w-3 h-3" aria-hidden="true" />
+        </button>
+      )}
 
       {/* Move to collection */}
       {!selectMode && collections.length > 0 && (
@@ -191,7 +191,7 @@ function CollectionGroup({ collection, projects, currentProject, onLoad, onDelet
       </button>
       {open && (
         <div className="pl-3 space-y-1 mt-0.5">
-          {projects.length === 0 ? (
+          {projects.length === 0 && !selectMode ? (
             <p className="text-[10px] text-muted-foreground/60 px-2 py-1 italic">{t.emptyCollection}</p>
           ) : projects.map(p => (
             <ProjectItem
@@ -236,6 +236,7 @@ export default function ProjectsPanel({ currentProject, onLoad, onNew, onSave })
   const exitSelectMode = () => {
     setSelectMode(false);
     setSelectedIds(new Set());
+    setSearch("");
   };
 
   const fetchAll = useCallback(async () => {

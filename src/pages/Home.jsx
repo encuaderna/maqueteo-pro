@@ -127,7 +127,7 @@ export default function Home() {
     setCurrentProject(project);
     setActiveTab("text");
     toast({ title: t.toastLoaded(project.title || t.withoutTitle) });
-  }, [toast]);
+  }, [toast, t]);
 
   useKeyboardShortcuts({
     onSave: handleSaveProject,

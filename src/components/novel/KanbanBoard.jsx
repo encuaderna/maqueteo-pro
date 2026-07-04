@@ -21,6 +21,8 @@ function KanbanCard({ project, onMove, onLoad, columns, t }) {
     try {
       await base44.entities.FormattingProject.update(project.id, { status: newStatus });
       onMove(project.id, newStatus);
+    } catch (e) {
+      console.error("Error al mover proyecto:", e);
     } finally {
       setMoving(false);
     }
