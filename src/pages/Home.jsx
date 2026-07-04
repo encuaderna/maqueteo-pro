@@ -389,6 +389,38 @@ export default function Home() {
             )}
           </main>
 
+          {/* Stats sidebar */}
+          {text && (
+            <aside aria-label="Estadísticas del texto" className="lg:w-44 flex-shrink-0 hidden lg:block">
+              <div className="sticky top-20 rounded-xl border border-border bg-card p-4 space-y-4">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estadísticas</h2>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Palabras</p>
+                    <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{wordCount.toLocaleString("es-CL")}</p>
+                  </div>
+                  <div className="h-px bg-border" />
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Capítulos</p>
+                    <p className="text-2xl font-heading font-semibold tabular-nums leading-none">{chapters.length}</p>
+                  </div>
+                  {chapters.length > 0 && (
+                    <>
+                      <div className="h-px bg-border" />
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Promedio / cap.</p>
+                        <p className="text-lg font-heading font-semibold tabular-nums leading-none">
+                          {Math.round(wordCount / chapters.length).toLocaleString("es-CL")}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">palabras</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </aside>
+          )}
+
           {/* Right panel: preview */}
           {showPreview && text && (
             <aside aria-label="Vista previa del libro" className="lg:w-[600px] flex-shrink-0">
