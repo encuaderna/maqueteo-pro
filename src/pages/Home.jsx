@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, Settings, FileText, Loader2, History } from "lucide-react";
+import { BookOpen, Download, Eye, Settings, FileText, Loader2, History, SplitSquareHorizontal } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { parseChapters, countWords, DEFAULT_SETTINGS } from "@/lib/formatting-utils";
@@ -12,6 +12,7 @@ import BookPreview from "@/components/novel/BookPreview";
 import ProjectsPanel from "@/components/novel/ProjectsPanel";
 import AccessibilityControls from "@/components/novel/AccessibilityControls";
 import HistoryPanel from "@/components/novel/HistoryPanel";
+import ReviewPanel from "@/components/novel/ReviewPanel";
 import { useLocalHistory } from "@/hooks/useLocalHistory";
 
 export default function Home() {
@@ -34,6 +35,7 @@ export default function Home() {
   const [showPreview, setShowPreview] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showReview, setShowReview] = useState(false);
 
   const { history, lastSavedAt, deleteVersion, clearHistory, exportHistory, importHistory } =
     useLocalHistory(text, metadata, settings);
@@ -251,6 +253,19 @@ export default function Home() {
               )}
             </Button>
 
+            {/* Review mode */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-8 gap-1.5"
+              onClick={() => setShowReview(true)}
+              disabled={!text}
+              aria-label="Abrir modo revisión"
+            >
+              <SplitSquareHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Revisar</span>
+            </Button>
+
             {/* Preview toggle */}
             <Button
               variant={showPreview ? "secondary" : "outline"}
@@ -416,6 +431,15 @@ export default function Home() {
           </section>
         )}
       </div>
+
+      {/* Review panel */}
+      {showReview && chapters.length > 0 && (
+        <ReviewPanel
+          chapters={chapters}
+          rawText={text}
+          onClose={() => setShowReview(false)}
+        />
+      )}
 
       {/* History panel */}
       {showHistory && (
