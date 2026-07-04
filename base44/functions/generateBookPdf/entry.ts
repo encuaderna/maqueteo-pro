@@ -367,7 +367,7 @@ Deno.serve(async (req) => {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${(metadata.title || 'libro').replace(/[^a-zA-Z0-9áéíóúñ\s]/g, '')}.pdf"`,
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent((metadata.title || 'libro').replace(/"/g, '').trim() || 'libro')}.pdf`,
       },
     });
   } catch (error) {

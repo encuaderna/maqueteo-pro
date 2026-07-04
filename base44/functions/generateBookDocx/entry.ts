@@ -323,7 +323,7 @@ Deno.serve(async (req) => {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="${filename}.docx"`,
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(filename)}.docx`,
       },
     });
   } catch (error) {

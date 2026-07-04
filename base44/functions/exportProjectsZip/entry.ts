@@ -187,8 +187,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: "format must be 'pdf' or 'docx'" }, { status: 400 });
     }
 
-    // Fetch projects
-    const allProjects = await base44.asServiceRole.entities.FormattingProject.filter({ id: { $in: projectIds } });
+    // Fetch only projects that belong to the authenticated user (prevents IDOR)
+    const allProjects = await base44.asServiceRole.entities.FormattingProject.filter({
+      id: { $in: projectIds },
+      created_by_id: user.id,
+    });
 
     const files = [];
     for (const project of allProjects) {
