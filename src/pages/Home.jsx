@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Download, Eye, Settings, FileText, Loader2, ChevronDown, History } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { BookOpen, Download, Eye, Settings, FileText, Loader2, History } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { parseChapters, countWords, DEFAULT_SETTINGS } from "@/lib/formatting-utils";
@@ -266,11 +265,26 @@ export default function Home() {
               {showPreview ? "Ocultar" : "Previsualizar"}
             </Button>
 
-            {/* Download split button */}
-            <div className="flex items-center" role="group" aria-label="Opciones de descarga">
+            {/* Download buttons */}
+            <div className="flex items-center gap-2" role="group" aria-label="Opciones de descarga">
               <Button
                 size="sm"
-                className="text-xs h-8 rounded-r-none border-r border-primary-foreground/20"
+                variant="outline"
+                className="text-xs h-8"
+                onClick={handleGenerateDocx}
+                disabled={isGenerating || isGeneratingDocx || !text}
+                aria-busy={isGeneratingDocx}
+              >
+                {isGeneratingDocx ? (
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                ) : (
+                  <FileText className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+                )}
+                {isGeneratingDocx ? "Generando…" : "Word"}
+              </Button>
+              <Button
+                size="sm"
+                className="text-xs h-8"
                 onClick={handleGeneratePdf}
                 disabled={isGenerating || isGeneratingDocx || !text}
                 aria-busy={isGenerating}
@@ -280,34 +294,8 @@ export default function Home() {
                 ) : (
                   <Download className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                 )}
-                {isGenerating ? "Generando PDF…" : "Descargar PDF"}
+                {isGenerating ? "Generando…" : "PDF"}
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="text-xs h-8 rounded-l-none px-2"
-                    disabled={isGenerating || isGeneratingDocx || !text}
-                    aria-label="Más formatos"
-                  >
-                    <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[180px]">
-                  <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating}>
-                    <Download className="w-3.5 h-3.5 mr-2" aria-hidden="true" />
-                    Descargar PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleGenerateDocx} disabled={isGeneratingDocx}>
-                    {isGeneratingDocx ? (
-                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-                    ) : (
-                      <FileText className="w-3.5 h-3.5 mr-2" aria-hidden="true" />
-                    )}
-                    {isGeneratingDocx ? "Generando Word…" : "Descargar Word (.docx)"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
