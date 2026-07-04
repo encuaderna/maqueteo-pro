@@ -106,6 +106,19 @@ export default {
   a11yDark: "Dark mode",
   a11ySystem: "Use system preference",
 
+  // Templates panel
+  templatesTitle: "Format templates",
+  templatesSaveBtn: "Save current settings as template",
+  templatesNamePlaceholder: "Template name",
+  templatesEmpty: "You have no saved templates yet.",
+  templatesApply: "Apply",
+  templatesSaved: "Template saved",
+  templatesSavedDesc: (n) => `"${n}" ready to use.`,
+  templatesApplied: (n) => `Template "${n}" applied`,
+  templatesDeleted: (n) => `Template "${n}" deleted`,
+  templatesErrorSave: "Error saving",
+  templatesDeleteLabel: (n) => `Delete template "${n}"`,
+
   // Language selector
   language: "Language",
 };

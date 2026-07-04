@@ -106,6 +106,19 @@ export default {
   a11yDark: "Modo escuro",
   a11ySystem: "Usar preferência do sistema",
 
+  // Templates panel
+  templatesTitle: "Modelos de formato",
+  templatesSaveBtn: "Salvar configurações atuais como modelo",
+  templatesNamePlaceholder: "Nome do modelo",
+  templatesEmpty: "Você ainda não tem modelos salvos.",
+  templatesApply: "Aplicar",
+  templatesSaved: "Modelo salvo",
+  templatesSavedDesc: (n) => `"${n}" pronto para usar.`,
+  templatesApplied: (n) => `Modelo "${n}" aplicado`,
+  templatesDeleted: (n) => `Modelo "${n}" excluído`,
+  templatesErrorSave: "Erro ao salvar",
+  templatesDeleteLabel: (n) => `Excluir modelo "${n}"`,
+
   // Language selector
   language: "Idioma",
 };

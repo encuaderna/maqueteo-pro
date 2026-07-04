@@ -106,6 +106,19 @@ export default {
   a11yDark: "Modo oscuro",
   a11ySystem: "Usar preferencia del sistema",
 
+  // Templates panel
+  templatesTitle: "Plantillas de formato",
+  templatesSaveBtn: "Guardar configuración actual como plantilla",
+  templatesNamePlaceholder: "Nombre de la plantilla",
+  templatesEmpty: "Aún no tienes plantillas guardadas.",
+  templatesApply: "Aplicar",
+  templatesSaved: "Plantilla guardada",
+  templatesSavedDesc: (n) => `"${n}" lista para usar.`,
+  templatesApplied: (n) => `Plantilla "${n}" aplicada`,
+  templatesDeleted: (n) => `Plantilla "${n}" eliminada`,
+  templatesErrorSave: "Error al guardar",
+  templatesDeleteLabel: (n) => `Eliminar plantilla "${n}"`,
+
   // Language selector
   language: "Idioma",
 };
