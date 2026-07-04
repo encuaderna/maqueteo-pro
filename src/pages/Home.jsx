@@ -18,6 +18,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ShortcutsHint from "@/components/novel/ShortcutsHint";
 import QuickNotes from "@/components/novel/QuickNotes";
 import LanguageSelector from "@/components/novel/LanguageSelector";
+import KanbanBoard from "@/components/novel/KanbanBoard";
 import { useLang } from "@/lib/LanguageContext";
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
   const [currentProject, setCurrentProject] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [showKanban, setShowKanban] = useState(false);
 
   const { history, lastSavedAt, deleteVersion, clearHistory, exportHistory, importHistory } =
     useLocalHistory(text, metadata, settings);
@@ -268,6 +270,18 @@ export default function Home() {
                   {history.length}
                 </span>
               )}
+            </Button>
+
+            {/* Kanban board */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-8 gap-1.5"
+              onClick={() => setShowKanban(true)}
+              aria-label={t.kanbanBtn}
+            >
+              <SplitSquareHorizontal className="w-3.5 h-3.5 rotate-90" aria-hidden="true" />
+              <span className="hidden sm:inline">{t.kanbanBtn}</span>
             </Button>
 
             {/* Review mode */}
@@ -512,6 +526,14 @@ export default function Home() {
           chapters={chapters}
           rawText={text}
           onClose={() => setShowReview(false)}
+        />
+      )}
+
+      {/* Kanban board */}
+      {showKanban && (
+        <KanbanBoard
+          onLoad={handleLoadProject}
+          onClose={() => setShowKanban(false)}
         />
       )}
 

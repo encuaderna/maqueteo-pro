@@ -119,6 +119,16 @@ export default {
   templatesErrorSave: "Erro ao salvar",
   templatesDeleteLabel: (n) => `Excluir modelo "${n}"`,
 
+  // Kanban
+  kanbanTitle: "Quadro de projetos",
+  kanbanClose: "Fechar quadro",
+  kanbanBtn: "Quadro",
+  kanbanDraft: "Rascunho",
+  kanbanEditing: "Em edição",
+  kanbanFormatting: "Formatando",
+  kanbanReady: "Pronto",
+  kanbanEmpty: "Sem projetos",
+
   // Language selector
   language: "Idioma",
 };

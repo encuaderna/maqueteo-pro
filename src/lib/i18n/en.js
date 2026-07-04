@@ -119,6 +119,16 @@ export default {
   templatesErrorSave: "Error saving",
   templatesDeleteLabel: (n) => `Delete template "${n}"`,
 
+  // Kanban
+  kanbanTitle: "Projects board",
+  kanbanClose: "Close board",
+  kanbanBtn: "Board",
+  kanbanDraft: "Draft",
+  kanbanEditing: "Editing",
+  kanbanFormatting: "Formatting",
+  kanbanReady: "Ready",
+  kanbanEmpty: "No projects",
+
   // Language selector
   language: "Language",
 };

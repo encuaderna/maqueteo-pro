@@ -119,6 +119,16 @@ export default {
   templatesErrorSave: "Error al guardar",
   templatesDeleteLabel: (n) => `Eliminar plantilla "${n}"`,
 
+  // Kanban
+  kanbanTitle: "Tablero de proyectos",
+  kanbanClose: "Cerrar tablero",
+  kanbanBtn: "Tablero",
+  kanbanDraft: "Borrador",
+  kanbanEditing: "En edición",
+  kanbanFormatting: "Formateando",
+  kanbanReady: "Listo",
+  kanbanEmpty: "Sin proyectos",
+
   // Language selector
   language: "Idioma",
 };
