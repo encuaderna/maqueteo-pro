@@ -16,6 +16,7 @@ import ReviewPanel from "@/components/novel/ReviewPanel";
 import { useLocalHistory } from "@/hooks/useLocalHistory";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ShortcutsHint from "@/components/novel/ShortcutsHint";
+import QuickNotes from "@/components/novel/QuickNotes";
 
 export default function Home() {
   const { toast } = useToast();
@@ -375,6 +376,12 @@ export default function Home() {
                 <SettingsPanel settings={settings} onChange={setSettings} />
               </TabsContent>
             </Tabs>
+
+            {/* Quick notes for active project */}
+            <QuickNotes
+              project={currentProject}
+              onNotesChange={(notes) => setCurrentProject(prev => prev ? { ...prev, notes } : prev)}
+            />
 
             {/* Chapter summary */}
             {chapters.length > 0 && (
