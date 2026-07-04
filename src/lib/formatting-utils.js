@@ -48,8 +48,50 @@ export function cleanWhitespace(text) {
   return text;
 }
 
+// Remove AO3-specific artifacts from pasted text
+export function removeAO3Artifacts(text) {
+  const lines = text.split('\n');
+  const filtered = lines.filter(line => {
+    const t = line.trim();
+    if (!t) return true; // keep blank lines for paragraph structure
+
+    // Navigation / UI links
+    if (/^(←|→|‹|›|«|»)\s*(Previous|Next|Anterior|Siguiente)/i.test(t)) return false;
+    if (/^(Previous Chapter|Next Chapter|Capítulo anterior|Siguiente capítulo)/i.test(t)) return false;
+    if (/^\[?(Previous|Next)\]?\s*Chapter/i.test(t)) return false;
+
+    // AO3 chapter header labels
+    if (/^Chapter Text$/i.test(t)) return false;
+    if (/^Texto del capítulo$/i.test(t)) return false;
+
+    // AO3 action/stats lines
+    if (/^(Kudos|Bookmarks?|Comments?|Hits|Words?|Chapters?|Series|Collections?):\s*\d/i.test(t)) return false;
+    if (/^\d+\s+(Kudos|Bookmarks?|Comments?|Hits)/i.test(t)) return false;
+    if (/^(↑\s*Top|↓\s*Comments?|Leave a Comment|Post Comment)/i.test(t)) return false;
+
+    // AO3 tag/metadata lines at top of chapters
+    if (/^(Rating|Category|Fandom|Relationship|Character|Additional Tags?|Language|Published|Updated|Words|Chapters|Comments|Kudos|Bookmarks|Hits):\s+/i.test(t)) return false;
+
+    // AO3 end-of-chapter navigation
+    if (/^←\s*\d+|^\d+\s*→/.test(t)) return false;
+
+    // Common copy-paste UI artifacts
+    if (/^Share$/i.test(t)) return false;
+    if (/^Reblog$/i.test(t)) return false;
+    if (/^\[locked\]|\[orphan\]|\[deleted\]/i.test(t)) return false;
+
+    return true;
+  });
+
+  // Collapse 3+ consecutive blank lines to 2
+  let result = filtered.join('\n');
+  result = result.replace(/\n{3,}/g, '\n\n');
+  return result;
+}
+
 // Apply all typography fixes
 export function applyTypography(text) {
+  text = removeAO3Artifacts(text);
   text = cleanWhitespace(text);
   text = fixQuotes(text);
   text = fixDashes(text);
