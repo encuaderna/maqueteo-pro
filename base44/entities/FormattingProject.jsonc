@@ -45,6 +45,9 @@
     "text_url": {
       "type": "string",
       "format": "uri"
+    },
+    "collection_id": {
+      "type": "string"
     }
   },
   "required": [
