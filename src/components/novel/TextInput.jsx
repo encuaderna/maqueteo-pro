@@ -19,39 +19,42 @@ export default function TextInput({ text, onChange }) {
   };
 
   return (
-    <div className="space-y-3">
+    <section aria-label="Texto de la novela" className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+        <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground" id="text-input-label">
           Texto de la novela
-        </h3>
-        <div className="flex items-center gap-2">
-          {text && (
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <FileText className="w-3 h-3" />
-              {formatWordCount(wordCount)} palabras
-            </span>
-          )}
-        </div>
+        </h2>
+        {text && (
+          <span className="text-xs text-muted-foreground flex items-center gap-1" aria-live="polite" aria-label={`${formatWordCount(wordCount)} palabras`}>
+            <FileText className="w-3 h-3" aria-hidden="true" />
+            {formatWordCount(wordCount)} palabras
+          </span>
+        )}
       </div>
 
-      <div className="relative">
-        <Textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Pega aquí el texto de tu novela...&#10;&#10;Los capítulos se detectan automáticamente si comienzan con 'Capítulo 1', 'Chapter 2', etc.&#10;&#10;Las notas del autor se detectan si están después de 'Nota del autor:' o 'Author's Note:' al final de cada capítulo."
-          className="min-h-[300px] text-sm leading-relaxed font-serif resize-y"
-        />
-      </div>
+      <Textarea
+        ref={textareaRef}
+        id="novel-text"
+        aria-labelledby="text-input-label"
+        aria-describedby="text-input-hint"
+        value={text}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Pega aquí el texto de tu novela..."
+        className="min-h-[300px] text-sm leading-relaxed font-serif resize-y focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+      />
+      <p id="text-input-hint" className="text-xs text-muted-foreground">
+        Los capítulos se detectan si comienzan con "Capítulo 1", "Chapter 2", etc. Las notas del autor se detectan después de "Nota del autor:" al final de cada capítulo.
+      </p>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="group" aria-label="Acciones de texto">
         <Button
           variant="outline"
           size="sm"
           onClick={handlePaste}
-          className="text-xs"
+          className="text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+          aria-label="Pegar texto desde el portapapeles"
         >
-          <ClipboardPaste className="w-3.5 h-3.5 mr-1.5" />
+          <ClipboardPaste className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
           Pegar del portapapeles
         </Button>
         {text && (
@@ -59,13 +62,14 @@ export default function TextInput({ text, onChange }) {
             variant="ghost"
             size="sm"
             onClick={() => onChange("")}
-            className="text-xs text-muted-foreground"
+            className="text-xs text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+            aria-label="Limpiar todo el texto de la novela"
           >
-            <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+            <Trash2 className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
             Limpiar
           </Button>
         )}
       </div>
-    </div>
+    </section>
   );
 }
