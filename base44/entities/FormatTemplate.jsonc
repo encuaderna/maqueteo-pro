@@ -1,0 +1,19 @@
+{
+  "name": "FormatTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "name",
+    "settings"
+  ]
+}

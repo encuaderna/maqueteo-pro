@@ -9,6 +9,7 @@ import { Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import FontPicker from "@/components/novel/FontPicker";
+import TemplatesPanel from "@/components/novel/TemplatesPanel";
 
 export default function SettingsPanel({ settings, onChange }) {
   const update = (field, value) => {
@@ -29,6 +30,8 @@ export default function SettingsPanel({ settings, onChange }) {
 
   return (
     <div className="space-y-6">
+      <TemplatesPanel settings={settings} onApply={onChange} />
+
       <h3 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
         Configuración
       </h3>
