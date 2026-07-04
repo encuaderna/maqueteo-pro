@@ -207,92 +207,93 @@ export default function Home() {
       </a>
 
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50" role="banner">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+      <header className="border-b border-border bg-background sticky top-0 z-50" role="banner">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+          {/* Brand */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <BookOpen className="w-5 h-5 text-foreground" aria-hidden="true" />
-            <span className="text-base font-heading font-semibold tracking-tight" aria-label="Novelista — Formateador de novelas">
+            <span className="font-heading font-semibold tracking-tight" aria-label="Novelista — Formateador de novelas">
               Novelista
             </span>
-            <span className="text-[10px] text-muted-foreground tracking-wider uppercase font-medium px-1.5 py-0.5 bg-muted rounded" aria-hidden="true">
-              Formateador
-            </span>
             {currentProject && (
-              <span className="text-xs text-muted-foreground hidden sm:inline truncate max-w-[160px]" aria-live="polite" aria-label={`Proyecto activo: ${currentProject.title || "Sin título"}`}>
-                / {currentProject.title || "Sin título"}
+              <span className="text-sm text-muted-foreground hidden sm:inline truncate max-w-[160px]" aria-live="polite">
+                · {currentProject.title || "Sin título"}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            {/* Accessibility controls */}
-            <AccessibilityControls />
-            <div aria-hidden="true" className="w-px h-4 bg-border" />
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            {/* Stats pill — only when there's content */}
+            {text && (
+              <span className="text-xs text-muted-foreground hidden md:flex items-center gap-1.5 bg-muted px-2.5 py-1 rounded-full" aria-live="polite">
+                <FileText className="w-3 h-3" aria-hidden="true" />
+                {chapters.length} cap. · {wordCount.toLocaleString()} palabras
+              </span>
+            )}
+
+            <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
+
+            {/* History */}
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs h-8 gap-1.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+              className={`text-xs h-8 gap-1.5 ${showHistory ? "bg-accent text-accent-foreground" : ""}`}
               onClick={() => setShowHistory(v => !v)}
               aria-pressed={showHistory}
-              aria-label={showHistory ? "Cerrar historial de versiones" : "Abrir historial de versiones"}
-              title="Historial de versiones"
+              aria-label={showHistory ? "Cerrar historial" : "Abrir historial"}
             >
               <History className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Historial</span>
               {history.length > 0 && (
-                <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4">
+                <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4" aria-hidden="true">
                   {history.length}
                 </span>
               )}
             </Button>
-            <div aria-hidden="true" className="w-px h-4 bg-border" />
 
-            {text && (
-              <span className="text-xs text-muted-foreground hidden sm:flex items-center gap-1.5" aria-live="polite" aria-label={`${chapters.length} ${chapters.length === 1 ? "capítulo" : "capítulos"}, ${wordCount.toLocaleString()} palabras`}>
-                <FileText className="w-3 h-3" aria-hidden="true" />
-                {chapters.length} {chapters.length === 1 ? "capítulo" : "capítulos"} · {wordCount.toLocaleString()} palabras
-              </span>
-            )}
+            {/* Preview toggle */}
             <Button
-              variant="outline"
+              variant={showPreview ? "secondary" : "outline"}
               size="sm"
-              className="text-xs h-8 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+              className="text-xs h-8"
               onClick={() => setShowPreview(!showPreview)}
               disabled={!text}
               aria-pressed={showPreview}
-              aria-label={showPreview ? "Ocultar vista previa del libro" : "Mostrar vista previa del libro"}
+              aria-label={showPreview ? "Ocultar vista previa" : "Ver vista previa"}
             >
               <Eye className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-              {showPreview ? "Ocultar" : "Vista previa"}
+              {showPreview ? "Ocultar" : "Previsualizar"}
             </Button>
+
+            {/* Download split button */}
             <div className="flex items-center" role="group" aria-label="Opciones de descarga">
               <Button
                 size="sm"
-                className="text-xs h-8 rounded-r-none border-r border-primary-foreground/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                className="text-xs h-8 rounded-r-none border-r border-primary-foreground/20"
                 onClick={handleGeneratePdf}
                 disabled={isGenerating || isGeneratingDocx || !text}
                 aria-busy={isGenerating}
-                aria-label={isGenerating ? "Generando PDF, por favor espera" : "Descargar libro en formato PDF"}
               >
                 {isGenerating ? (
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
                 ) : (
                   <Download className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                 )}
-                {isGenerating ? "Generando..." : "Descargar PDF"}
+                {isGenerating ? "Generando PDF…" : "Descargar PDF"}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     size="sm"
-                    className="text-xs h-8 rounded-l-none px-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                    className="text-xs h-8 rounded-l-none px-2"
                     disabled={isGenerating || isGeneratingDocx || !text}
-                    aria-label="Más opciones de descarga"
-                    aria-haspopup="menu"
+                    aria-label="Más formatos"
                   >
                     <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="min-w-[180px]">
                   <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating}>
                     <Download className="w-3.5 h-3.5 mr-2" aria-hidden="true" />
                     Descargar PDF
@@ -303,11 +304,14 @@ export default function Home() {
                     ) : (
                       <FileText className="w-3.5 h-3.5 mr-2" aria-hidden="true" />
                     )}
-                    {isGeneratingDocx ? "Generando..." : "Descargar Word (.docx)"}
+                    {isGeneratingDocx ? "Generando Word…" : "Descargar Word (.docx)"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
+            <AccessibilityControls />
           </div>
         </div>
       </header>
@@ -357,20 +361,23 @@ export default function Home() {
 
             {/* Chapter summary */}
             {chapters.length > 0 && (
-              <section aria-label="Resumen de capítulos detectados" className="mt-6 p-4 rounded-xl bg-muted/50 border border-border/50">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Capítulos detectados
-                </h2>
-                <ol className="space-y-1.5" aria-label="Lista de capítulos">
+              <section aria-label="Capítulos detectados" className="mt-4 rounded-xl border border-border overflow-hidden">
+                <div className="px-4 py-2.5 bg-muted/40 border-b border-border flex items-center justify-between">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {chapters.length} {chapters.length === 1 ? "capítulo detectado" : "capítulos detectados"}
+                  </h2>
+                  <span className="text-xs text-muted-foreground tabular-nums">{wordCount.toLocaleString()} palabras en total</span>
+                </div>
+                <ol className="divide-y divide-border/60">
                   {chapters.map((ch, i) => (
-                    <li key={i} className="flex items-baseline justify-between text-sm">
-                      <span className="text-foreground">
-                        <span className="text-muted-foreground font-medium">Cap. {ch.number}</span>
-                        {ch.title && <span className="ml-2">{ch.title}</span>}
+                    <li key={i} className="flex items-center justify-between px-4 py-2 text-sm hover:bg-muted/30 transition-colors">
+                      <span className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground tabular-nums w-8">#{ch.number}</span>
+                        <span className="text-foreground truncate max-w-[200px]">{ch.title || <span className="text-muted-foreground italic">Sin título</span>}</span>
+                        {ch.notes && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">notas</span>}
                       </span>
-                      <span className="text-xs text-muted-foreground tabular-nums">
-                        {countWords(ch.content).toLocaleString()} palabras
-                        {ch.notes && <span aria-label=", incluye notas del autor"> · con notas</span>}
+                      <span className="text-xs text-muted-foreground tabular-nums flex-shrink-0 ml-4">
+                        {countWords(ch.content).toLocaleString()} pal.
                       </span>
                     </li>
                   ))}
@@ -398,24 +405,26 @@ export default function Home() {
           )}
         </div>
 
-        {/* Empty state */}
+        {/* Empty state — shown only when no text and no chapters */}
         {!text && (
-          <section aria-label="Estado inicial — sin texto" className="mt-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/60 flex items-center justify-center" aria-hidden="true">
-              <BookOpen className="w-7 h-7 text-muted-foreground" aria-hidden="true" />
-            </div>
-            <h2 className="text-lg font-heading font-medium mb-2">
-              Formatea tu novela para impresión
-            </h2>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-              Pega el texto de tu historia, configura los metadatos y opciones de formato,
-              y descarga un PDF listo para imprimir con tipografía profesional.
+          <section aria-label="Bienvenida" className="mt-10 text-center max-w-lg mx-auto">
+            <h2 className="text-base font-heading font-semibold mb-1">Formatea tu novela para impresión</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Pega el texto, completa los metadatos y descarga un PDF o Word con tipografía profesional.
             </p>
-            <ul className="flex flex-wrap justify-center gap-3 mt-6 list-none p-0" aria-label="Características incluidas">
-              {["Comillas tipográficas", "Em dashes", "Letra capital", "Encabezados", "Notas del autor", "Separadores de escena"].map(f => (
-                <li key={f} className="px-2.5 py-1 rounded-full bg-muted/60 border border-border/50 text-xs text-muted-foreground">{f}</li>
+            <div className="grid grid-cols-3 gap-3 mt-6 text-left">
+              {[
+                { step: "1", label: "Pega el texto", desc: "Desde AO3 u otra fuente" },
+                { step: "2", label: "Ajusta los detalles", desc: "Título, autor, formato" },
+                { step: "3", label: "Descarga", desc: "PDF o Word listo para imprimir" },
+              ].map(({ step, label, desc }) => (
+                <div key={step} className="rounded-xl border border-border bg-card p-3">
+                  <div className="text-xs font-bold text-muted-foreground mb-1">Paso {step}</div>
+                  <div className="text-sm font-medium text-foreground">{label}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
         )}
       </div>
