@@ -89,12 +89,95 @@ export function removeAO3Artifacts(text) {
   return result;
 }
 
+// Harry Potter canon term corrections
+const HP_CORRECTIONS = [
+  // Characters & proper names
+  [/\bwalpurga\b/gi, 'Walburga'],
+  [/\bgodrick\b/gi, 'Godric'],
+  [/\bgodric\b/gi, 'Godric'],
+  [/\bmerlin\b/gi, 'Merlin'],
+  [/\bdumbledore\b/gi, 'Dumbledore'],
+  [/\bseverus snape\b/gi, 'Severus Snape'],
+  [/\bmcgonagall\b/gi, 'McGonagall'],
+
+  // Houses
+  [/\bgryffindor\b/gi, 'Gryffindor'],
+  [/\bslytherin\b/gi, 'Slytherin'],
+  [/\bravenclaw\b/gi, 'Ravenclaw'],
+  [/\bhufflepuff\b/gi, 'Hufflepuff'],
+
+  // Creatures & beings
+  [/\banimagus\b/gi, 'Animagus'],
+  [/\bmuggle\b/gi, 'Muggle'],
+  [/\bsquib\b/gi, 'Squib'],
+  [/\bdementor\b/gi, 'Dementor'],
+  [/\bveela\b/gi, 'Veela'],
+  [/\bacromantula\b/gi, 'Acromantula'],
+  [/\bboggart\b/gi, 'Boggart'],
+
+  // Groups & factions
+  [/\bdeath eaters\b/gi, 'Death Eaters'],
+  [/\bmarauders\b/gi, 'Marauders'],
+  [/\border of the phoenix\b/gi, 'Order of the Phoenix'],
+  [/\bdumbledore's army\b/gi, "Dumbledore's Army"],
+
+  // Blood status terms (hyphenation first, then capitalization)
+  [/\bmuggle-born\b/gi, 'Muggle-born'],
+  [/\bmuggle born\b/gi, 'Muggle-born'],
+  [/\bmuggleborn\b/gi, 'Muggle-born'],
+  [/\bmudblood\b/gi, 'Mudblood'],
+  [/\bhalf[-\s]blood\b/gi, 'half-blood'],
+  [/\bhalfblood\b/gi, 'half-blood'],
+  [/\bpure[-\s]blood\b/gi, 'pure-blood'],
+  [/\bpureblood\b/gi, 'pure-blood'],
+  [/\bhalf[-\s]breed\b/gi, 'half-breed'],
+  [/\bhalfbreed\b/gi, 'half-breed'],
+  [/\bhouse[-\s]elf\b/gi, 'house-elf'],
+  [/\bblood traitor\b/gi, 'Blood Traitor'],
+  [/\bdark lord\b/gi, 'Dark Lord'],
+
+  // Places
+  [/\bhogwarts\b/gi, 'Hogwarts'],
+  [/\bdiagon alley\b/gi, 'Diagon Alley'],
+  [/\bazkaban\b/gi, 'Azkaban'],
+  [/\bforbidden forest\b/gi, 'Forbidden Forest'],
+  [/\bchamber of secrets\b/gi, 'Chamber of Secrets'],
+  [/\bministry of magic\b/gi, 'Ministry of Magic'],
+
+  // Objects & artifacts
+  [/\belder wand\b/gi, 'Elder Wand'],
+  [/\bmarauder's map\b/gi, "Marauder's Map"],
+  [/\bmarauder's\b/gi, "Marauder's"],
+  [/\bgolden snitch\b/gi, 'Golden Snitch'],
+  [/\bsorting hat\b/gi, 'Sorting Hat'],
+  [/\bhorcrux\b/gi, 'Horcrux'],
+  [/\bpensieve\b/gi, 'Pensieve'],
+
+  // Spells & magic
+  [/\bexpelliarmus\b/gi, 'Expelliarmus'],
+  [/\bstupefy\b/gi, 'Stupefy'],
+  [/\bexpecto patronum\b/gi, 'Expecto Patronum'],
+  [/\bpatronus\b/gi, 'Patronus'],
+
+  // Quidditch
+  [/\bquaffle\b/gi, 'Quaffle'],
+  [/\bbludger\b/gi, 'Bludger'],
+];
+
+export function fixHarryPotterTerms(text) {
+  for (const [pattern, replacement] of HP_CORRECTIONS) {
+    text = text.replace(pattern, replacement);
+  }
+  return text;
+}
+
 // Apply all typography fixes
 export function applyTypography(text) {
   text = removeAO3Artifacts(text);
   text = cleanWhitespace(text);
   text = fixQuotes(text);
   text = fixDashes(text);
+  text = fixHarryPotterTerms(text);
   return text;
 }
 
