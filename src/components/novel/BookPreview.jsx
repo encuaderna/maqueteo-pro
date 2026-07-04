@@ -78,6 +78,14 @@ function renderParagraphs(text, settings, isChapterStart) {
     }
 
     const showDropCap = settings.showDropCap && isChapterStart && i === 0;
+    const dc = settings.dropCap || {};
+    const dcFont = dc.font || 'Garamond';
+    const dcMult = dc.sizeMultiplier || 3;
+    const dcLines = dc.linesHigh || 2;
+    // Approximate line height in em for the drop cap height
+    const dcLineHeight = (settings.lineSpacing || 1.5);
+    const dcFontSize = `${dcMult}em`;
+    const dcFloatHeight = `${dcLines * dcLineHeight}em`;
 
     return (
       <p
@@ -94,12 +102,14 @@ function renderParagraphs(text, settings, isChapterStart) {
             <span
               style={{
                 float: "left",
-                fontSize: "2.2em",
-                lineHeight: 0.8,
+                fontSize: dcFontSize,
+                lineHeight: 1,
+                height: dcFloatHeight,
                 paddingRight: "3px",
-                paddingTop: "2px",
+                paddingTop: "1px",
+                fontFamily: `'${dcFont}', serif`,
                 fontWeight: 500,
-                color: "#333",
+                color: "#222",
               }}
             >
               {trimmed[0]}

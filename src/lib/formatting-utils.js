@@ -8,6 +8,11 @@ export const DEFAULT_SETTINGS = {
   showToc: true,
   showMetadata: true,
   showDropCap: true,
+  dropCap: {
+    font: 'Garamond', // 'Garamond', 'Georgia', 'serif'
+    sizeMultiplier: 3, // 2, 3, 4 — multiplier over body font
+    linesHigh: 2, // how many lines the cap spans visually
+  },
   authorNotesStyle: 'A', // 'A' = subtle, 'B' = boxed
   sceneSeparator: 'fleuron', // 'fleuron', 'ornament', 'stars', 'line', 'custom'
   customSeparatorUrl: null,

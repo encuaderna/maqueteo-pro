@@ -189,9 +189,11 @@ function buildDocx(chapters, metadata, settings) {
 
       // Drop cap for first paragraph of chapter (simulate with larger first letter)
       if (i === 0 && settings.showDropCap && trimmed.length > 1) {
+        const dcMult = settings.dropCap?.sizeMultiplier || 3;
+        const dcFont = settings.dropCap?.font || 'Garamond';
         const first = trimmed[0];
         const rest = trimmed.slice(1);
-        body += `<w:p>${bodyPpr(0)}<w:r><w:rPr><w:rFonts w:ascii="Garamond" w:hAnsi="Garamond"/><w:sz w:val="${fs * 3}"/><w:szCs w:val="${fs * 3}"/></w:rPr><w:t xml:space="preserve">${esc(first)}</w:t></w:r><w:r><w:rPr>${bodyRpr}</w:rPr><w:t xml:space="preserve">${esc(rest)}</w:t></w:r></w:p>`;
+        body += `<w:p>${bodyPpr(0)}<w:r><w:rPr><w:rFonts w:ascii="${esc(dcFont)}" w:hAnsi="${esc(dcFont)}"/><w:sz w:val="${Math.round(fs * dcMult)}"/><w:szCs w:val="${Math.round(fs * dcMult)}"/></w:rPr><w:t xml:space="preserve">${esc(first)}</w:t></w:r><w:r><w:rPr>${bodyRpr}</w:rPr><w:t xml:space="preserve">${esc(rest)}</w:t></w:r></w:p>`;
         continue;
       }
 

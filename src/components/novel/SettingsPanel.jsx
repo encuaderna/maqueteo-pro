@@ -126,10 +126,65 @@ export default function SettingsPanel({ settings, onChange }) {
           <Switch checked={settings.showMetadata} onCheckedChange={(v) => update("showMetadata", v)} />
         </div>
         <div className="flex items-center justify-between">
-          <Label className="text-xs">Letra capital</Label>
+          <Label className="text-xs">Letra capital (drop cap)</Label>
           <Switch checked={settings.showDropCap} onCheckedChange={(v) => update("showDropCap", v)} />
         </div>
       </div>
+
+      {/* Drop Cap Options */}
+      {settings.showDropCap && (
+        <div className="space-y-3 pl-3 border-l-2 border-border/50">
+          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Opciones de letra capital</Label>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs">Fuente</Label>
+            <Select
+              value={settings.dropCap?.font || 'Garamond'}
+              onValueChange={(v) => update("dropCap", { ...settings.dropCap, font: v })}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Garamond">Garamond</SelectItem>
+                <SelectItem value="Georgia">Georgia</SelectItem>
+                <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+                <SelectItem value="serif">Serif genérica</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Tamaño (× fuente base)</Label>
+              <span className="text-xs text-muted-foreground">{settings.dropCap?.sizeMultiplier || 3}×</span>
+            </div>
+            <Slider
+              value={[settings.dropCap?.sizeMultiplier || 3]}
+              onValueChange={([v]) => update("dropCap", { ...settings.dropCap, sizeMultiplier: v })}
+              min={2}
+              max={5}
+              step={0.5}
+              className="w-full"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Altura en líneas</Label>
+              <span className="text-xs text-muted-foreground">{settings.dropCap?.linesHigh || 2} líneas</span>
+            </div>
+            <Slider
+              value={[settings.dropCap?.linesHigh || 2]}
+              onValueChange={([v]) => update("dropCap", { ...settings.dropCap, linesHigh: v })}
+              min={2}
+              max={4}
+              step={1}
+              className="w-full"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Author Notes Style */}
       <div className="space-y-2">

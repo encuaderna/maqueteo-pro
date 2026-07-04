@@ -133,8 +133,9 @@ Deno.serve(async (req) => {
 
         // Drop cap for chapter start
         if (isChapterStart && i === 0 && settings.showDropCap && para.length > 1) {
+          const dcMult = settings.dropCap?.sizeMultiplier || 3;
           doc.setFont('times', 'bold');
-          doc.setFontSize(fontSize * 2.5);
+          doc.setFontSize(fontSize * dcMult);
           doc.setTextColor(30, 30, 30);
           const firstChar = para[0];
           doc.text(firstChar, marginSides, y + 2);
