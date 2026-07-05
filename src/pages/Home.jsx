@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Download, Eye, FileText, Loader2, History, SplitSquareHorizontal, ChevronDown, Settings2 } from "lucide-react";
@@ -550,6 +551,15 @@ export default function Home() {
           onClose={() => setShowKanban(false)}
         />
       )}
+
+      {/* Footer */}
+      <footer className="border-t border-border mt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-center">
+          <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4">
+            Política de Privacidad
+          </Link>
+        </div>
+      </footer>
 
       {/* PWA install banner */}
       <InstallPWA />
