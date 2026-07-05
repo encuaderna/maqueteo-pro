@@ -1,6 +1,6 @@
 export default {
   // Header
-  appName: "Novelista",
+  appName: "Maqueteo Pro",
   chaptersCount: (n) => `${n} cap.`,
   words: (n) => `${n} palabras`,
   history: "Historial",

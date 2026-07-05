@@ -82,7 +82,7 @@ export function useLocalHistory(text, metadata, settings) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `novelista_historial_${Date.now()}.json`;
+    a.download = `maqueteo_pro_historial_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }, [history]);
