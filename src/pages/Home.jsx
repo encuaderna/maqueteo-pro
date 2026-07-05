@@ -18,6 +18,8 @@ import QuickNotes from "@/components/novel/QuickNotes";
 import KanbanBoard from "@/components/novel/KanbanBoard";
 import InstallPWA from "@/components/InstallPWA";
 import SettingsMenu from "@/components/novel/SettingsMenu";
+import SaveIndicator from "@/components/novel/SaveIndicator";
+import MobileMenu from "@/components/novel/MobileMenu";
 import { useLang } from "@/lib/LanguageContext";
 import {
   DropdownMenu,
@@ -30,6 +32,7 @@ export default function Home() {
   const { toast } = useToast();
   const { t } = useLang();
   const [text, setText] = useState("");
+  const handleTextChange = (v) => { setText(v); setIsSaved(false); };
   const [metadata, setMetadata] = useState({
     title: "",
     author: "",
@@ -41,6 +44,8 @@ export default function Home() {
     warnings: "",
   });
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const handleSettingsChange = (v) => { setSettings(v); setIsSaved(false); };
+  const handleMetadataChange = (v) => { setMetadata(v); setIsSaved(false); };
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingDocx, setIsGeneratingDocx] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
@@ -49,6 +54,7 @@ export default function Home() {
   const [showHistory, setShowHistory] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [showKanban, setShowKanban] = useState(false);
+  const [isSaved, setIsSaved] = useState(true);
 
   const { history, lastSavedAt, deleteVersion, clearHistory, exportHistory, importHistory } =
     useLocalHistory(text, metadata, settings);
@@ -103,10 +109,12 @@ export default function Home() {
       if (currentProject?.id) {
         await base44.entities.FormattingProject.update(currentProject.id, data);
         setCurrentProject(prev => ({ ...prev, ...data }));
+        setIsSaved(true);
         toast({ title: t.toastSaved });
       } else {
         const created = await base44.entities.FormattingProject.create(data);
         setCurrentProject(created);
+        setIsSaved(true);
         toast({ title: t.toastSaved });
       }
     } catch (e) {
@@ -130,6 +138,7 @@ export default function Home() {
     });
     setSettings({ ...DEFAULT_SETTINGS, ...cleanSettings });
     setCurrentProject(project);
+    setIsSaved(true);
     setActiveTab("text");
     toast({ title: t.toastLoaded(project.title || t.withoutTitle) });
   }, [toast, t]);
@@ -147,6 +156,7 @@ export default function Home() {
     setMetadata({ title: "", author: "", year: "", fandom: "", pairings: "", summary: "", original_link: "", warnings: "" });
     setSettings(DEFAULT_SETTINGS);
     setCurrentProject(null);
+    setIsSaved(true);
     setActiveTab("text");
   }, []);
 
@@ -249,6 +259,11 @@ export default function Home() {
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
+            {/* Save indicator */}
+            {(currentProject || text) && (
+              <SaveIndicator isSaved={isSaved} />
+            )}
+
             {/* Stats pill — only when there's content */}
             {text && (
               <span className="text-xs text-muted-foreground hidden md:flex items-center gap-1.5 bg-muted px-2.5 py-1 rounded-full" aria-live="polite">
@@ -259,95 +274,113 @@ export default function Home() {
 
             <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
 
-            {/* Secondary actions group */}
-            {/* History */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`text-xs h-8 gap-1.5 ${showHistory ? "bg-accent text-accent-foreground" : ""}`}
-              onClick={() => setShowHistory(v => !v)}
-              aria-pressed={showHistory}
-              aria-label={t.history}
-            >
-              <History className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">{t.history}</span>
-              {history.length > 0 && (
-                <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4" aria-hidden="true">
-                  {history.length}
-                </span>
-              )}
-            </Button>
+            {/* Desktop-only actions */}
+            <div className="hidden sm:flex items-center gap-2">
+              {/* History */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`text-xs h-8 gap-1.5 ${showHistory ? "bg-accent text-accent-foreground" : ""}`}
+                onClick={() => setShowHistory(v => !v)}
+                aria-pressed={showHistory}
+                aria-label={t.history}
+              >
+                <History className="w-3.5 h-3.5" aria-hidden="true" />
+                <span className="hidden sm:inline">{t.history}</span>
+                {history.length > 0 && (
+                  <span className="bg-primary text-primary-foreground text-[9px] rounded-full px-1 min-w-[16px] text-center leading-4" aria-hidden="true">
+                    {history.length}
+                  </span>
+                )}
+              </Button>
 
-            {/* Kanban board — secondary action, icon only on smaller viewports */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={() => setShowKanban(true)}
-              aria-label={t.kanbanBtn}
-              title={t.kanbanBtn}
-            >
-              <SplitSquareHorizontal className="w-3.5 h-3.5 rotate-90" aria-hidden="true" />
-            </Button>
+              {/* Kanban board */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowKanban(true)}
+                aria-label={t.kanbanBtn}
+                title={t.kanbanBtn}
+              >
+                <SplitSquareHorizontal className="w-3.5 h-3.5 rotate-90" aria-hidden="true" />
+              </Button>
 
-            {/* Review mode — secondary action, icon only */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={() => setShowReview(true)}
-              disabled={!text}
-              aria-label={t.review}
-              title={t.review}
-            >
-              <SplitSquareHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
-            </Button>
+              {/* Review mode */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowReview(true)}
+                disabled={!text}
+                aria-label={t.review}
+                title={t.review}
+              >
+                <SplitSquareHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
+              </Button>
 
-            <div aria-hidden="true" className="w-px h-4 bg-border hidden sm:block" />
+              <div aria-hidden="true" className="w-px h-4 bg-border" />
 
-            {/* Preview toggle */}
-            <Button
-              variant={showPreview ? "secondary" : "outline"}
-              size="sm"
-              className="text-xs h-8"
-              onClick={() => setShowPreview(!showPreview)}
-              disabled={!text}
-              aria-pressed={showPreview}
-              aria-label={showPreview ? t.hidePreview : t.showPreview}
-            >
-              <Eye className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
-              {showPreview ? t.hidePreview : t.showPreview}
-            </Button>
+              {/* Preview toggle */}
+              <Button
+                variant={showPreview ? "secondary" : "outline"}
+                size="sm"
+                className="text-xs h-8"
+                onClick={() => setShowPreview(!showPreview)}
+                disabled={!text}
+                aria-pressed={showPreview}
+                aria-label={showPreview ? t.hidePreview : t.showPreview}
+              >
+                <Eye className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+                {showPreview ? t.hidePreview : t.showPreview}
+              </Button>
 
-            {/* Export dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className="text-xs h-8 gap-1.5"
-                  disabled={isGenerating || isGeneratingDocx || !text}
-                  aria-label="Exportar documento"
-                >
-                  {(isGenerating || isGeneratingDocx) ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-                  ) : (
-                    <Download className="w-3.5 h-3.5" aria-hidden="true" />
-                  )}
-                  {isGenerating ? t.generatingPdf : isGeneratingDocx ? t.generatingWord : t.exportBtn ?? "Exportar"}
-                  <ChevronDown className="w-3 h-3 opacity-60" aria-hidden="true" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[160px]">
-                <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
-                  <Download className="w-3.5 h-3.5" />
-                  <span>PDF</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleGenerateDocx} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Word (.docx)</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              {/* Export dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="text-xs h-8 gap-1.5"
+                    disabled={isGenerating || isGeneratingDocx || !text}
+                    aria-label="Exportar documento"
+                  >
+                    {(isGenerating || isGeneratingDocx) ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                    ) : (
+                      <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                    )}
+                    {isGenerating ? t.generatingPdf : isGeneratingDocx ? t.generatingWord : t.exportBtn ?? "Exportar"}
+                    <ChevronDown className="w-3 h-3 opacity-60" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenuItem onClick={handleGeneratePdf} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
+                    <Download className="w-3.5 h-3.5" />
+                    <span>PDF</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleGenerateDocx} disabled={isGenerating || isGeneratingDocx} className="gap-2 cursor-pointer">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Word (.docx)</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Mobile hamburger menu */}
+            <MobileMenu
+              showPreview={showPreview}
+              onTogglePreview={() => text && setShowPreview(v => !v)}
+              textExists={!!text}
+              showHistory={showHistory}
+              onToggleHistory={() => setShowHistory(v => !v)}
+              historyCount={history.length}
+              onShowKanban={() => setShowKanban(true)}
+              onShowReview={() => setShowReview(true)}
+              isGenerating={isGenerating}
+              isGeneratingDocx={isGeneratingDocx}
+              onGeneratePdf={handleGeneratePdf}
+              onGenerateDocx={handleGenerateDocx}
+            />
 
             <SettingsMenu />
           </div>
@@ -385,15 +418,15 @@ export default function Home() {
               </TabsList>
 
               <TabsContent value="text" className="mt-0 adhd-focus-section">
-                <TextInput text={text} onChange={setText} />
+                <TextInput text={text} onChange={handleTextChange} settings={settings} />
               </TabsContent>
 
               <TabsContent value="metadata" className="mt-0 adhd-focus-section">
-                <MetadataForm metadata={metadata} onChange={setMetadata} />
+                <MetadataForm metadata={metadata} onChange={handleMetadataChange} />
               </TabsContent>
 
               <TabsContent value="settings" className="mt-0 adhd-focus-section">
-                <SettingsPanel settings={settings} onChange={setSettings} />
+                <SettingsPanel settings={settings} onChange={handleSettingsChange} />
               </TabsContent>
             </Tabs>
 
