@@ -47,6 +47,15 @@ export function fixDashes(text) {
   return text;
 }
 
+// Normalize ellipsis: three+ dots (tight or spaced) → …
+export function fixEllipsis(text) {
+  // Three or more consecutive periods → ellipsis character
+  text = text.replace(/\.{3,}/g, '\u2026');
+  // Spaced dot-dot-dot (. . .) → ellipsis
+  text = text.replace(/(?:\.\s){2,}\./g, '\u2026');
+  return text;
+}
+
 // Clean up whitespace
 export function cleanWhitespace(text) {
   // Remove double spaces
@@ -187,6 +196,7 @@ export function applyTypography(text) {
   text = cleanWhitespace(text);
   text = fixQuotes(text);
   text = fixDashes(text);
+  text = fixEllipsis(text);
   text = fixHarryPotterTerms(text);
   return text;
 }
